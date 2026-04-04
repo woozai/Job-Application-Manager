@@ -1,0 +1,8 @@
+.codex*
+frontend/node_modules
+frontend/dist
+frontend/AGENTS.md
+
+backend/AGENTS.md
+AGENTS.md
+SPEC.md
