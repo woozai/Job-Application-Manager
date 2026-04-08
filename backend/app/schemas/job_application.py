@@ -72,7 +72,7 @@ class JobApplicationBase(BaseSchema):
 
 
 class JobApplicationCreate(JobApplicationBase):
-    user_id: int = Field(..., description="ID of the user creating the application")
+    pass
 
 
 class JobApplicationUpdate(BaseSchema):
@@ -139,9 +139,6 @@ class JobApplicationUpdate(BaseSchema):
     tags: Optional[str] = Field(
         None, description="Tags associated with the application"
     )
-    user_id: Optional[int] = Field(None, description="ID of the user")
-
-
 class JobApplicationResponse(JobApplicationBase):
     id: int = Field(..., description="Unique identifier for the job application")
     user_id: int = Field(..., description="ID of the user who owns the application")

@@ -1,11 +1,21 @@
 from sqlalchemy.orm import Session
 
 from app.models.contact import Contact
+from app.models.job_application import JobApplication
 from app.schemas.contact import ContactCreate, ContactUpdate
 
 
 def get_contact(db: Session, contact_id: int) -> Contact | None:
     return db.query(Contact).filter(Contact.id == contact_id).first()
+
+
+def get_contact_for_user(db: Session, contact_id: int, user_id: int) -> Contact | None:
+    return (
+        db.query(Contact)
+        .join(JobApplication, Contact.job_application_id == JobApplication.id)
+        .filter(Contact.id == contact_id, JobApplication.user_id == user_id)
+        .first()
+    )
 
 
 def get_contacts_by_job_application(
@@ -22,6 +32,19 @@ def get_contacts_by_job_application(
 
 def get_contacts(db: Session, skip: int = 0, limit: int = 100) -> list[Contact]:
     return db.query(Contact).offset(skip).limit(limit).all()
+
+
+def get_contacts_for_user(
+    db: Session, user_id: int, skip: int = 0, limit: int = 100
+) -> list[Contact]:
+    return (
+        db.query(Contact)
+        .join(JobApplication, Contact.job_application_id == JobApplication.id)
+        .filter(JobApplication.user_id == user_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 
 def create_contact(db: Session, contact: ContactCreate) -> Contact:
