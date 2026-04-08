@@ -62,7 +62,9 @@ async def update_job_application_endpoint(
     db: Session = Depends(get_db),
 ) -> JobApplication:
     db_job_application = update_job_application(
-        db, job_application_id=job_application_id, job_application_update=job_application
+        db,
+        job_application_id=job_application_id,
+        job_application_update=job_application,
     )
     if db_job_application is None:
         raise HTTPException(status_code=404, detail="Job application not found")
@@ -70,7 +72,9 @@ async def update_job_application_endpoint(
 
 
 @router.delete("/{job_application_id}")
-async def delete_job_application_endpoint(job_application_id: int, db: Session = Depends(get_db)):
+async def delete_job_application_endpoint(
+    job_application_id: int, db: Session = Depends(get_db)
+):
     success = delete_job_application(db, job_application_id=job_application_id)
     if not success:
         raise HTTPException(status_code=404, detail="Job application not found")

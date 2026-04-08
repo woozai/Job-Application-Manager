@@ -6,9 +6,7 @@ from app.schemas.job_application import JobApplicationCreate, JobApplicationUpda
 
 def get_job_application(db: Session, job_application_id: int) -> JobApplication | None:
     return (
-        db.query(JobApplication)
-        .filter(JobApplication.id == job_application_id)
-        .first()
+        db.query(JobApplication).filter(JobApplication.id == job_application_id).first()
     )
 
 
@@ -24,11 +22,15 @@ def get_job_applications_by_user(
     )
 
 
-def get_job_applications(db: Session, skip: int = 0, limit: int = 100) -> list[JobApplication]:
+def get_job_applications(
+    db: Session, skip: int = 0, limit: int = 100
+) -> list[JobApplication]:
     return db.query(JobApplication).offset(skip).limit(limit).all()
 
 
-def create_job_application(db: Session, job_application: JobApplicationCreate) -> JobApplication:
+def create_job_application(
+    db: Session, job_application: JobApplicationCreate
+) -> JobApplication:
     db_job_application = JobApplication(**job_application.model_dump())
     db.add(db_job_application)
     db.commit()
@@ -40,9 +42,7 @@ def update_job_application(
     db: Session, job_application_id: int, job_application_update: JobApplicationUpdate
 ) -> JobApplication | None:
     db_job_application = (
-        db.query(JobApplication)
-        .filter(JobApplication.id == job_application_id)
-        .first()
+        db.query(JobApplication).filter(JobApplication.id == job_application_id).first()
     )
     if not db_job_application:
         return None
@@ -56,9 +56,7 @@ def update_job_application(
 
 def delete_job_application(db: Session, job_application_id: int) -> bool:
     db_job_application = (
-        db.query(JobApplication)
-        .filter(JobApplication.id == job_application_id)
-        .first()
+        db.query(JobApplication).filter(JobApplication.id == job_application_id).first()
     )
     if not db_job_application:
         return False

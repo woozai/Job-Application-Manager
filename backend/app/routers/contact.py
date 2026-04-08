@@ -39,9 +39,14 @@ async def read_contact(contact_id: int, db: Session = Depends(get_db)) -> Contac
     return db_contact
 
 
-@router.get("/job-application/{job_application_id}", response_model=list[ContactResponse])
+@router.get(
+    "/job-application/{job_application_id}", response_model=list[ContactResponse]
+)
 async def read_contacts_by_job_application(
-    job_application_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+    job_application_id: int,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
 ) -> list[Contact]:
     contacts = get_contacts_by_job_application(
         db, job_application_id=job_application_id, skip=skip, limit=limit
