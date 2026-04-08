@@ -9,46 +9,100 @@ from app.schemas.base import BaseSchema
 
 
 class ContactBase(BaseSchema):
-    name: str
-    profile_link: Optional[str] = None
-    company: Optional[str] = None
-    job_title: Optional[str] = None
-    relationship_type: Optional[str] = None
-    priority: Optional[str] = None
-    connection_requested_at: Optional[date] = None
-    connection_approved: bool = False
-    connection_approved_at: Optional[date] = None
-    message_sent: bool = False
-    message_sent_at: Optional[date] = None
-    response_status: Optional[str] = None
-    last_interaction_date: Optional[date] = None
-    notes: Optional[str] = None
+    name: str = Field(..., max_length=255, description="Name of the contact")
+    profile_link: Optional[str] = Field(
+        None, description="Link to the contact's profile"
+    )
+    company: Optional[str] = Field(
+        None, max_length=255, description="Company where the contact works"
+    )
+    job_title: Optional[str] = Field(
+        None, max_length=255, description="Job title of the contact"
+    )
+    relationship_type: Optional[str] = Field(
+        None, max_length=100, description="Type of relationship with the contact"
+    )
+    priority: Optional[str] = Field(
+        None, max_length=50, description="Priority level of the contact"
+    )
+    connection_requested_at: Optional[date] = Field(
+        None, description="Date when connection was requested"
+    )
+    connection_approved: bool = Field(
+        False, description="Whether the connection was approved"
+    )
+    connection_approved_at: Optional[date] = Field(
+        None, description="Date when connection was approved"
+    )
+    message_sent: bool = Field(False, description="Whether a message was sent")
+    message_sent_at: Optional[date] = Field(
+        None, description="Date when message was sent"
+    )
+    response_status: Optional[str] = Field(
+        None, max_length=100, description="Status of the response"
+    )
+    last_interaction_date: Optional[date] = Field(
+        None, description="Date of last interaction"
+    )
+    notes: Optional[str] = Field(None, description="Additional notes about the contact")
 
 
 class ContactCreate(ContactBase):
-    job_application_id: int
+    job_application_id: int = Field(
+        ..., description="ID of the associated job application"
+    )
 
 
 class ContactUpdate(BaseSchema):
-    name: Optional[str] = None
-    profile_link: Optional[str] = None
-    company: Optional[str] = None
-    job_title: Optional[str] = None
-    relationship_type: Optional[str] = None
-    priority: Optional[str] = None
-    connection_requested_at: Optional[date] = None
-    connection_approved: Optional[bool] = None
-    connection_approved_at: Optional[date] = None
-    message_sent: Optional[bool] = None
-    message_sent_at: Optional[date] = None
-    response_status: Optional[str] = None
-    last_interaction_date: Optional[date] = None
-    notes: Optional[str] = None
-    job_application_id: Optional[int] = None
+    name: Optional[str] = Field(None, max_length=255, description="Name of the contact")
+    profile_link: Optional[str] = Field(
+        None, description="Link to the contact's profile"
+    )
+    company: Optional[str] = Field(
+        None, max_length=255, description="Company where the contact works"
+    )
+    job_title: Optional[str] = Field(
+        None, max_length=255, description="Job title of the contact"
+    )
+    relationship_type: Optional[str] = Field(
+        None, max_length=100, description="Type of relationship with the contact"
+    )
+    priority: Optional[str] = Field(
+        None, max_length=50, description="Priority level of the contact"
+    )
+    connection_requested_at: Optional[date] = Field(
+        None, description="Date when connection was requested"
+    )
+    connection_approved: Optional[bool] = Field(
+        None, description="Whether the connection was approved"
+    )
+    connection_approved_at: Optional[date] = Field(
+        None, description="Date when connection was approved"
+    )
+    message_sent: Optional[bool] = Field(None, description="Whether a message was sent")
+    message_sent_at: Optional[date] = Field(
+        None, description="Date when message was sent"
+    )
+    response_status: Optional[str] = Field(
+        None, max_length=100, description="Status of the response"
+    )
+    last_interaction_date: Optional[date] = Field(
+        None, description="Date of last interaction"
+    )
+    notes: Optional[str] = Field(None, description="Additional notes about the contact")
+    job_application_id: Optional[int] = Field(
+        None, description="ID of the associated job application"
+    )
 
 
 class ContactResponse(ContactBase):
-    id: int
-    job_application_id: int
-    created_at: datetime
-    updated_at: datetime
+    id: int = Field(..., description="Unique identifier for the contact")
+    job_application_id: int = Field(
+        ..., description="ID of the associated job application"
+    )
+    created_at: datetime = Field(
+        ..., description="Timestamp when the contact was created"
+    )
+    updated_at: datetime = Field(
+        ..., description="Timestamp when the contact was last updated"
+    )
