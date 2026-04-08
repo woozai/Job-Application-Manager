@@ -11,6 +11,7 @@ from app.services.user import (
     get_users,
     update_user,
 )
+from backend.app.models.user import User
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.post("/", response_model=UserResponse)
 async def create_user_endpoint(
     user: UserCreate, db: Session = Depends(get_db)
-) -> UserResponse:
+) -> User:
     db_user = get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -28,13 +29,13 @@ async def create_user_endpoint(
 @router.get("/", response_model=list[UserResponse])
 async def read_users(
     skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
-) -> list[UserResponse]:
+) -> list[User]:
     users = get_users(db, skip=skip, limit=limit)
     return users
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-async def read_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse:
+async def read_user(user_id: int, db: Session = Depends(get_db)) -> User:
     db_user = get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -44,7 +45,7 @@ async def read_user(user_id: int, db: Session = Depends(get_db)) -> UserResponse
 @router.put("/{user_id}", response_model=UserResponse)
 async def update_user_endpoint(
     user_id: int, user: UserUpdate, db: Session = Depends(get_db)
-) -> UserResponse:
+) -> User:
     db_user = update_user(db, user_id=user_id, user_update=user)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
