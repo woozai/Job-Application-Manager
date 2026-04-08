@@ -6,7 +6,7 @@ from app.schemas.job_application import (
     JobApplicationResponse,
     JobApplicationUpdate,
 )
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import Token, UserCreate, UserResponse, UserUpdate
 
 
 __all__ = [
@@ -16,6 +16,7 @@ __all__ = [
     "JobApplicationCreate",
     "JobApplicationResponse",
     "JobApplicationUpdate",
+    "Token",
     "UserCreate",
     "UserResponse",
     "UserUpdate",

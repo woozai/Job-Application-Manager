@@ -1,15 +1,21 @@
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.core.auth import CurrentUser, create_access_token
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import Token, UserCreate, UserResponse, UserUpdate
 from app.services.user import (
+    authenticate_user,
     create_user,
     delete_user,
     get_user,
     get_user_by_email,
-    get_users,
+    get_user_by_username,
     update_user,
 )
 
@@ -18,40 +24,92 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post("/", response_model=UserResponse)
 async def create_user_endpoint(user: UserCreate, db: Session = Depends(get_db)) -> User:
-    db_user = get_user_by_email(db, email=user.email)
-    if db_user:
+    if get_user_by_username(db, username=user.username):
+        raise HTTPException(status_code=400, detail="Username already exists")
+    if get_user_by_email(db, email=user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
     return create_user(db, user)
 
 
+@router.post("/token", response_model=Token)
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+) -> Token:
+    user = authenticate_user(db, email=form_data.username, password=form_data.password)
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": str(user.id)},
+        expires_delta=access_token_expires,
+    )
+    return Token(access_token=access_token, token_type="bearer")
+
+
+@router.get("/me", response_model=UserResponse)
+async def read_current_user(current_user: CurrentUser) -> User:
+    return current_user
+
+
 @router.get("/", response_model=list[UserResponse])
 async def read_users(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+    current_user: CurrentUser,
 ) -> list[User]:
-    users = get_users(db, skip=skip, limit=limit)
-    return users
+    return [current_user]
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-async def read_user(user_id: int, db: Session = Depends(get_db)) -> User:
-    db_user = get_user(db, user_id=user_id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+async def read_user(user_id: int, current_user: CurrentUser) -> User:
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to view this user")
+
+    return current_user
 
 
 @router.put("/{user_id}", response_model=UserResponse)
 async def update_user_endpoint(
-    user_id: int, user: UserUpdate, db: Session = Depends(get_db)
+    user_id: int,
+    user: UserUpdate,
+    current_user: CurrentUser,
+    db: Session = Depends(get_db),
 ) -> User:
-    db_user = update_user(db, user_id=user_id, user_update=user)
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to update this user")
+
+    if user.username is not None:
+        existing_user = get_user_by_username(db, username=user.username)
+        if existing_user is not None and existing_user.id != user_id:
+            raise HTTPException(status_code=400, detail="Username already exists")
+
+    if user.email is not None:
+        existing_email = get_user_by_email(db, email=user.email)
+        if existing_email is not None and existing_email.id != user_id:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    db_user = get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+    updated_user = update_user(db, user_id=user_id, user_update=user)
+    if updated_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return updated_user
 
 
 @router.delete("/{user_id}")
-async def delete_user_endpoint(user_id: int, db: Session = Depends(get_db)):
+async def delete_user_endpoint(
+    user_id: int,
+    current_user: CurrentUser,
+    db: Session = Depends(get_db),
+):
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this user")
+
     success = delete_user(db, user_id=user_id)
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
