@@ -10,6 +10,16 @@ def get_job_application(db: Session, job_application_id: int) -> JobApplication 
     )
 
 
+def get_job_application_for_user(
+    db: Session, job_application_id: int, user_id: int
+) -> JobApplication | None:
+    return (
+        db.query(JobApplication)
+        .filter(JobApplication.id == job_application_id, JobApplication.user_id == user_id)
+        .first()
+    )
+
+
 def get_job_applications_by_user(
     db: Session, user_id: int, skip: int = 0, limit: int = 100
 ) -> list[JobApplication]:
@@ -29,9 +39,9 @@ def get_job_applications(
 
 
 def create_job_application(
-    db: Session, job_application: JobApplicationCreate
+    db: Session, job_application: JobApplicationCreate, user_id: int
 ) -> JobApplication:
-    db_job_application = JobApplication(**job_application.model_dump())
+    db_job_application = JobApplication(**job_application.model_dump(), user_id=user_id)
     db.add(db_job_application)
     db.commit()
     db.refresh(db_job_application)

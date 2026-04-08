@@ -39,3 +39,8 @@ class UserResponse(UserBase):
     updated_at: datetime = Field(
         ..., description="Timestamp when the user was last updated"
     )
+
+
+class Token(BaseSchema):
+    access_token: str = Field(..., description="JWT access token")
+    token_type: str = Field(..., description="Token type")
