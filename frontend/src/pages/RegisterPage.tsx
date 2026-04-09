@@ -86,6 +86,10 @@ export function RegisterPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     const nextErrors = validateRegisterForm(formValues);
     setFormErrors(nextErrors);
     setSubmitError(null);
@@ -222,6 +226,11 @@ export function RegisterPage() {
             <button className="button-link button-link--primary" disabled={isSubmitting} type="submit">
               {isSubmitting ? "Creating account..." : "Create account"}
             </button>
+            {isSubmitting ? (
+              <p className="form-status" aria-live="polite">
+                Creating your account and preparing sign-in...
+              </p>
+            ) : null}
             <p className="auth-form__meta">
               Already have an account? <Link to="/login">Go to login</Link>
             </p>

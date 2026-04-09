@@ -16,6 +16,10 @@ export function CreateJobApplicationPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   async function handleCreate(payload: JobApplicationCreateInput) {
+    if (isSubmitting) {
+      return;
+    }
+
     if (!token) {
       setSubmitError("You must be signed in to create a job application.");
       return;
@@ -50,6 +54,7 @@ export function CreateJobApplicationPage() {
       onSubmit={handleCreate}
       submitError={submitError}
       submitLabel="Create application"
+      submittingLabel="Creating your application and preparing the details page..."
       title="Create a new job application"
     />
   );

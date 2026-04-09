@@ -77,6 +77,10 @@ export function LoginPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     const nextErrors = validateLoginForm(formValues);
     setFormErrors(nextErrors);
     setSubmitError(null);
@@ -165,6 +169,11 @@ export function LoginPage() {
             <button className="button-link button-link--primary" disabled={isSubmitting} type="submit">
               {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
+            {isSubmitting ? (
+              <p className="form-status" aria-live="polite">
+                Validating your credentials and loading your dashboard...
+              </p>
+            ) : null}
             <p className="auth-form__meta">
               Need an account? <Link to="/register">Create one</Link>
             </p>
