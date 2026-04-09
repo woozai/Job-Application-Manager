@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 
+import { useDocumentTitle } from "../hooks/useDocumentTitle";
+
 export function NotFoundPage() {
+  useDocumentTitle("Page Not Found | Job Application Manager");
+
   return (
     <section className="page-card">
       <p className="page-card__eyebrow">404</p>
