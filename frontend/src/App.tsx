@@ -5,6 +5,7 @@ import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
 import { AppShell } from "./components/layout/AppShell";
 import { AuthProvider } from "./hooks/useAuth";
 import { DashboardPage } from "./pages/DashboardPage";
+import { JobApplicationDetailsPage } from "./pages/JobApplicationDetailsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -17,6 +18,7 @@ export default function App() {
           <Route index element={<Navigate replace to="/dashboard" />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/job-applications/:jobApplicationId" element={<JobApplicationDetailsPage />} />
           </Route>
           <Route element={<PublicOnlyRoute />}>
             <Route path="/login" element={<LoginPage />} />
