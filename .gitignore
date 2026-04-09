@@ -1,6 +1,7 @@
 .codex*
 frontend/node_modules
 frontend/dist
+frontend/.env
 backend/.venv
 backend/job_applications.db
 backend/.pytest_cache
