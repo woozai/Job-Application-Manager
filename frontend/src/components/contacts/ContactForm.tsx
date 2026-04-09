@@ -1,6 +1,6 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
-import type { ContactCreateInput } from "../../types/contact";
+import type { ContactCreateInput, ContactResponse, ContactUpdateInput } from "../../types/contact";
 
 const relationshipOptions = ["recruiter", "employee", "manager", "friend", "referral source", "other"];
 const priorityOptions = ["low", "medium", "high"];
@@ -28,30 +28,35 @@ interface ContactFormErrors {
 }
 
 interface ContactFormProps {
+  contact?: ContactResponse | null;
   isSubmitting: boolean;
   jobApplicationId: number;
   submitError: string | null;
   successMessage: string | null;
-  onSubmit: (payload: ContactCreateInput) => Promise<boolean>;
+  onSubmit: (payload: ContactCreateInput | ContactUpdateInput) => Promise<boolean>;
   onCancel: () => void;
 }
 
-function createInitialValues(): ContactFormValues {
+function normalizeDateValue(value: string | null | undefined) {
+  return value ?? "";
+}
+
+function createInitialValues(contact?: ContactResponse | null): ContactFormValues {
   return {
-    name: "",
-    profile_link: "",
-    company: "",
-    job_title: "",
-    relationship_type: "",
-    priority: "",
-    connection_requested_at: "",
-    connection_approved: "false",
-    connection_approved_at: "",
-    message_sent: "false",
-    message_sent_at: "",
-    response_status: "",
-    last_interaction_date: "",
-    notes: "",
+    name: contact?.name ?? "",
+    profile_link: contact?.profile_link ?? "",
+    company: contact?.company ?? "",
+    job_title: contact?.job_title ?? "",
+    relationship_type: contact?.relationship_type ?? "",
+    priority: contact?.priority ?? "medium",
+    connection_requested_at: normalizeDateValue(contact?.connection_requested_at),
+    connection_approved: contact?.connection_approved ? "true" : "false",
+    connection_approved_at: normalizeDateValue(contact?.connection_approved_at),
+    message_sent: contact?.message_sent ? "true" : "false",
+    message_sent_at: normalizeDateValue(contact?.message_sent_at),
+    response_status: contact?.response_status ?? "",
+    last_interaction_date: normalizeDateValue(contact?.last_interaction_date),
+    notes: contact?.notes ?? "",
   };
 }
 
@@ -70,7 +75,10 @@ function validateForm(values: ContactFormValues) {
   return errors;
 }
 
-function buildPayload(values: ContactFormValues, jobApplicationId: number): ContactCreateInput {
+function buildPayload(
+  values: ContactFormValues,
+  jobApplicationId: number,
+): ContactCreateInput | ContactUpdateInput {
   return {
     job_application_id: jobApplicationId,
     name: values.name.trim(),
@@ -91,6 +99,7 @@ function buildPayload(values: ContactFormValues, jobApplicationId: number): Cont
 }
 
 export function ContactForm({
+  contact,
   isSubmitting,
   jobApplicationId,
   submitError,
@@ -98,9 +107,15 @@ export function ContactForm({
   onSubmit,
   onCancel,
 }: ContactFormProps) {
-  const initialValues = useMemo(() => createInitialValues(), []);
+  const isEditing = Boolean(contact);
+  const initialValues = useMemo(() => createInitialValues(contact), [contact]);
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
+
+  useEffect(() => {
+    setValues(initialValues);
+    setErrors({});
+  }, [initialValues]);
 
   function updateField<K extends keyof ContactFormValues>(field: K, value: ContactFormValues[K]) {
     setValues((currentValues) => ({
@@ -137,7 +152,7 @@ export function ContactForm({
 
     const wasSaved = await onSubmit(buildPayload(values, jobApplicationId));
 
-    if (wasSaved) {
+    if (wasSaved && !isEditing) {
       resetForm();
     }
   }
@@ -145,10 +160,19 @@ export function ContactForm({
   return (
     <section className="page-card">
       <p className="page-card__eyebrow">Contacts</p>
-      <h2>Add a contact</h2>
-      <p className="page-card__body">
-        Save the people connected to this opportunity so your outreach history stays attached to the job.
-      </p>
+      <div className="details-section__header">
+        <div>
+          <h2>{isEditing ? "Edit contact" : "Add a contact"}</h2>
+          <p className="page-card__body">
+            {isEditing
+              ? "Update this contact's details, outreach history, and notes without losing the job context."
+              : "Save the people connected to this opportunity so your outreach history stays attached to the job."}
+          </p>
+        </div>
+        <button className="button-link" disabled={isSubmitting} onClick={onCancel} type="button">
+          Close
+        </button>
+      </div>
 
       <form className="contact-form" noValidate onSubmit={handleSubmit}>
         <section className="contact-form__section">
@@ -384,14 +408,14 @@ export function ContactForm({
         {successMessage ? (
           <section className="feedback-panel feedback-panel--success" role="status">
             <p className="feedback-panel__eyebrow">Success</p>
-            <h3>Contact added</h3>
+            <h3>{isEditing ? "Contact updated" : "Contact added"}</h3>
             <p>{successMessage}</p>
           </section>
         ) : null}
 
         <div className="job-form__actions">
           <button className="button-link button-link--primary" disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Saving contact..." : "Add contact"}
+            {isSubmitting ? "Saving contact..." : isEditing ? "Save changes" : "Add contact"}
           </button>
           <button className="button-link" disabled={isSubmitting} onClick={resetForm} type="button">
             Reset form

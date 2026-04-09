@@ -30,6 +30,26 @@ function getBooleanLabel(value: boolean, positiveLabel: string, negativeLabel: s
   return value ? positiveLabel : negativeLabel;
 }
 
+function BooleanIcon({
+  value,
+  positiveLabel,
+  negativeLabel,
+}: {
+  value: boolean;
+  positiveLabel: string;
+  negativeLabel: string;
+}) {
+  return (
+    <span
+      aria-label={getBooleanLabel(value, positiveLabel, negativeLabel)}
+      className={`contacts-check ${value ? "contacts-check--checked" : "contacts-check--empty"}`}
+      role="img"
+    >
+      {value ? "✓" : "−"}
+    </span>
+  );
+}
+
 function getStatusTone(responseStatus: string | null) {
   const normalizedStatus = responseStatus?.trim().toLowerCase();
 
@@ -53,7 +73,19 @@ function getStatusTone(responseStatus: string | null) {
   return "muted";
 }
 
-export function ContactsTable({ contacts }: { contacts: ContactResponse[] }) {
+interface ContactsTableProps {
+  contacts: ContactResponse[];
+  deletingContactId?: number | null;
+  onDelete: (contact: ContactResponse) => void;
+  onEdit: (contact: ContactResponse) => void;
+}
+
+export function ContactsTable({
+  contacts,
+  deletingContactId = null,
+  onDelete,
+  onEdit,
+}: ContactsTableProps) {
   if (contacts.length === 0) {
     return (
       <section className="page-card contacts-empty-state">
@@ -94,9 +126,11 @@ export function ContactsTable({ contacts }: { contacts: ContactResponse[] }) {
               <th>Name</th>
               <th>Relationship</th>
               <th>Response status</th>
+              <th>Approved</th>
               <th>Message sent</th>
               <th>Notes</th>
               <th>Last interaction</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -129,19 +163,24 @@ export function ContactsTable({ contacts }: { contacts: ContactResponse[] }) {
                       <span className={`contacts-status contacts-status--${responseTone}`}>
                         {formatValue(contact.response_status, "Awaiting response")}
                       </span>
-                      <span className="contacts-table__subtle">
-                        Connection{" "}
-                        {getBooleanLabel(contact.connection_approved, "approved", "not approved")}
-                      </span>
                     </div>
                   </td>
                   <td>
+                    <BooleanIcon
+                      negativeLabel="Not approved"
+                      positiveLabel="Approved"
+                      value={contact.connection_approved}
+                    />
+                  </td>
+                  <td>
                     <div className="contacts-table__stack">
-                      <span>{getBooleanLabel(contact.message_sent, "Sent", "Not sent")}</span>
+                      <BooleanIcon
+                        negativeLabel="Message not sent"
+                        positiveLabel="Message sent"
+                        value={contact.message_sent}
+                      />
                       <span className="contacts-table__subtle">
-                        {contact.message_sent_at
-                          ? `On ${formatDateValue(contact.message_sent_at)}`
-                          : "No message date"}
+                        {contact.message_sent_at ? `On ${formatDateValue(contact.message_sent_at)}` : ""}
                       </span>
                     </div>
                   </td>
@@ -154,6 +193,21 @@ export function ContactsTable({ contacts }: { contacts: ContactResponse[] }) {
                       <span className="contacts-table__subtle">
                         Requested {formatDateValue(contact.connection_requested_at)}
                       </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="contacts-table__actions">
+                      <button className="button-link contacts-table__action-button" onClick={() => onEdit(contact)} type="button">
+                        Edit
+                      </button>
+                      <button
+                        className="button-link button-link--danger contacts-table__action-button"
+                        disabled={deletingContactId === contact.id}
+                        onClick={() => onDelete(contact)}
+                        type="button"
+                      >
+                        {deletingContactId === contact.id ? "Deleting..." : "Delete"}
+                      </button>
                     </div>
                   </td>
                 </tr>

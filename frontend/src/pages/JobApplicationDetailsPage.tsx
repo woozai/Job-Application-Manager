@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
-import { createContact } from "../api/contacts";
+import { createContact, deleteContact, updateContact } from "../api/contacts";
 import { deleteJobApplication, getJobApplication } from "../api/jobApplications";
 import { ContactForm } from "../components/contacts/ContactForm";
 import { ContactsTable } from "../components/contacts/ContactsTable";
@@ -10,7 +10,7 @@ import { ErrorState } from "../components/ui/ErrorState";
 import { LoadingState } from "../components/ui/LoadingState";
 import { useAuth } from "../hooks/useAuth";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import type { ContactCreateInput } from "../types/contact";
+import type { ContactCreateInput, ContactResponse, ContactUpdateInput } from "../types/contact";
 
 type DetailItemValue = ReactNode;
 
@@ -111,6 +111,12 @@ export function JobApplicationDetailsPage() {
   const [createContactError, setCreateContactError] = useState<string | null>(null);
   const [createContactSuccessMessage, setCreateContactSuccessMessage] = useState<string | null>(null);
   const [showCreateContactForm, setShowCreateContactForm] = useState(false);
+  const [editingContact, setEditingContact] = useState<ContactResponse | null>(null);
+  const [isSavingEditedContact, setIsSavingEditedContact] = useState(false);
+  const [editContactError, setEditContactError] = useState<string | null>(null);
+  const [contactPendingDelete, setContactPendingDelete] = useState<ContactResponse | null>(null);
+  const [deleteContactError, setDeleteContactError] = useState<string | null>(null);
+  const [isDeletingContact, setIsDeletingContact] = useState(false);
 
   useDocumentTitle("Job Details | Job Application Manager");
 
@@ -273,7 +279,7 @@ export function JobApplicationDetailsPage() {
     }
   }
 
-  async function handleCreateContact(payload: ContactCreateInput) {
+  async function handleCreateContact(payload: ContactCreateInput | ContactUpdateInput) {
     if (!token) {
       setCreateContactError("You must be signed in to add a contact.");
       return false;
@@ -284,7 +290,7 @@ export function JobApplicationDetailsPage() {
     setCreateContactSuccessMessage(null);
 
     try {
-      const createdContact = await createContact(payload, token);
+      const createdContact = await createContact(payload as ContactCreateInput, token);
 
       setJobApplication((currentJobApplication) => {
         if (!currentJobApplication) {
@@ -309,6 +315,91 @@ export function JobApplicationDetailsPage() {
       return false;
     } finally {
       setIsCreatingContact(false);
+    }
+  }
+
+  async function handleEditContact(payload: ContactCreateInput | ContactUpdateInput) {
+    if (!token || !editingContact) {
+      setEditContactError("We could not determine which contact to update.");
+      return false;
+    }
+
+    setIsSavingEditedContact(true);
+    setEditContactError(null);
+
+    try {
+      const updatedContact = await updateContact(editingContact.id, payload, token);
+
+      setJobApplication((currentJobApplication) => {
+        if (!currentJobApplication) {
+          return currentJobApplication;
+        }
+
+        return {
+          ...currentJobApplication,
+          contacts: currentJobApplication.contacts.map((contact) =>
+            contact.id === updatedContact.id ? updatedContact : contact,
+          ),
+        };
+      });
+
+      setCreateContactSuccessMessage(`${updatedContact.name} was updated successfully.`);
+      setEditingContact(null);
+      return true;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setEditContactError(error.message);
+      } else {
+        setEditContactError("We could not update this contact. Please try again.");
+      }
+      return false;
+    } finally {
+      setIsSavingEditedContact(false);
+    }
+  }
+
+  async function handleDeleteContact() {
+    if (!token || !contactPendingDelete) {
+      setDeleteContactError("We could not determine which contact to delete.");
+      return;
+    }
+
+    const contactToDelete = contactPendingDelete;
+
+    setIsDeletingContact(true);
+    setDeleteContactError(null);
+
+    try {
+      await deleteContact(contactToDelete.id, token);
+
+      setJobApplication((currentJobApplication) => {
+        if (!currentJobApplication) {
+          return currentJobApplication;
+        }
+
+        return {
+          ...currentJobApplication,
+          contacts: currentJobApplication.contacts.filter((contact) => contact.id !== contactToDelete.id),
+        };
+      });
+
+      if (editingContact?.id === contactToDelete.id) {
+        setEditingContact(null);
+      }
+
+      setContactPendingDelete(null);
+      setDeleteContactError(null);
+      setEditContactError(null);
+      setCreateContactError(null);
+      setCreateContactSuccessMessage(`${contactToDelete.name} was deleted successfully.`);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setDeleteContactError(error.message);
+      } else {
+        setDeleteContactError("We could not delete this contact. Please try again.");
+      }
+    } finally {
+      setIsDeletingContact(false);
     }
   }
 
@@ -413,7 +504,20 @@ export function JobApplicationDetailsPage() {
         </section>
       ))}
 
-      {showCreateContactForm ? (
+      {editingContact ? (
+        <ContactForm
+          contact={editingContact}
+          isSubmitting={isSavingEditedContact}
+          jobApplicationId={currentJobApplication.id}
+          onCancel={() => {
+            setEditingContact(null);
+            setEditContactError(null);
+          }}
+          onSubmit={handleEditContact}
+          submitError={editContactError}
+          successMessage={null}
+        />
+      ) : showCreateContactForm ? (
         <ContactForm
           isSubmitting={isCreatingContact}
           jobApplicationId={currentJobApplication.id}
@@ -424,7 +528,7 @@ export function JobApplicationDetailsPage() {
           }}
           onSubmit={handleCreateContact}
           submitError={createContactError}
-          successMessage={createContactSuccessMessage}
+          successMessage={null}
         />
       ) : (
         <section className="page-card">
@@ -448,10 +552,81 @@ export function JobApplicationDetailsPage() {
               Add contact
             </button>
           </div>
+          {createContactSuccessMessage ? (
+            <section className="feedback-panel feedback-panel--success" role="status">
+              <p className="feedback-panel__eyebrow">Success</p>
+              <h3>Contact saved</h3>
+              <p>{createContactSuccessMessage}</p>
+            </section>
+          ) : null}
         </section>
       )}
 
-      <ContactsTable contacts={currentJobApplication.contacts} />
+      {contactPendingDelete ? (
+        <section className="feedback-panel feedback-panel--error" role="alert">
+          <div className="feedback-panel__header">
+            <div>
+              <p className="feedback-panel__eyebrow">Delete action</p>
+              <h3>Delete {contactPendingDelete.name}?</h3>
+            </div>
+            <button
+              className="button-link"
+              disabled={isDeletingContact}
+              onClick={() => {
+                setContactPendingDelete(null);
+                setDeleteContactError(null);
+              }}
+              type="button"
+            >
+              Close
+            </button>
+          </div>
+          <p>
+            This will remove this contact and their outreach history from the application. This action cannot
+            be undone.
+          </p>
+          {deleteContactError ? <p className="form-error">{deleteContactError}</p> : null}
+          <div className="feedback-panel__action">
+            <button
+              className="button-link button-link--danger"
+              disabled={isDeletingContact}
+              onClick={handleDeleteContact}
+              type="button"
+            >
+              {isDeletingContact ? "Deleting..." : "Confirm delete"}
+            </button>
+            <button
+              className="button-link"
+              disabled={isDeletingContact}
+              onClick={() => {
+                setContactPendingDelete(null);
+                setDeleteContactError(null);
+              }}
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      <ContactsTable
+        contacts={currentJobApplication.contacts}
+        deletingContactId={isDeletingContact ? contactPendingDelete?.id ?? null : null}
+        onDelete={(contact) => {
+          setContactPendingDelete(contact);
+          setDeleteContactError(null);
+        }}
+        onEdit={(contact) => {
+          setEditingContact(contact);
+          setShowCreateContactForm(false);
+          setCreateContactError(null);
+          setCreateContactSuccessMessage(null);
+          setEditContactError(null);
+          setContactPendingDelete(null);
+          setDeleteContactError(null);
+        }}
+      />
 
       <section className="page-card">
         <div className="job-form__actions">
