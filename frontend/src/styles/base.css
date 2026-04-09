@@ -365,6 +365,28 @@ a {
   gap: 1rem;
 }
 
+.dashboard-filters {
+  gap: 1.25rem;
+}
+
+.dashboard-filters__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dashboard-filters__header h2 {
+  margin: 0;
+}
+
+.dashboard-filters__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
 .dashboard-section__header {
   display: flex;
   flex-wrap: wrap;
