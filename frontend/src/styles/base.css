@@ -387,6 +387,12 @@ a {
   margin: 0;
 }
 
+.dashboard-filters__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .dashboard-filters__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1180,6 +1186,7 @@ a {
 
   .dashboard-job-card__header,
   .feedback-panel__action,
+  .dashboard-filters__actions,
   .job-form__actions,
   .details-hero__actions,
   .contacts-table__actions {

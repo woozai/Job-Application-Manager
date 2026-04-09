@@ -25,6 +25,7 @@ export function DashboardPage() {
   const [applicationTypeFilter, setApplicationTypeFilter] = useState("all");
   const [dateFromFilter, setDateFromFilter] = useState("");
   const [dateToFilter, setDateToFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const routeState = location.state as { successMessage?: string } | null;
@@ -221,6 +222,15 @@ export function DashboardPage() {
           <Link className="button-link button-link--primary" to="/job-applications/new">
             Create new application
           </Link>
+          {jobApplications.length > 0 ? (
+            <button
+              className="button-link"
+              onClick={() => setShowFilters((current) => !current)}
+              type="button"
+            >
+              {showFilters ? "Close filters" : "Open filters"}
+            </button>
+          ) : null}
           <p className="dashboard-hero__hint">This entry point is ready for the upcoming create flow.</p>
         </div>
       </section>
@@ -234,16 +244,21 @@ export function DashboardPage() {
         ))}
       </section>
 
-      {!isLoadingApplications && !loadError && jobApplications.length > 0 ? (
+      {!isLoadingApplications && !loadError && jobApplications.length > 0 && showFilters ? (
         <section className="page-card dashboard-filters">
           <div className="dashboard-filters__header">
             <div>
               <p className="page-card__eyebrow">Search and filters</p>
               <h2>Find the right opportunity faster</h2>
             </div>
-            <button className="button-link" disabled={!hasActiveFilters} onClick={resetFilters} type="button">
-              Clear filters
-            </button>
+            <div className="dashboard-filters__actions">
+              <button className="button-link" disabled={!hasActiveFilters} onClick={resetFilters} type="button">
+                Clear filters
+              </button>
+              <button className="button-link" onClick={() => setShowFilters(false)} type="button">
+                Close filters
+              </button>
+            </div>
           </div>
 
           <div className="dashboard-filters__grid">
