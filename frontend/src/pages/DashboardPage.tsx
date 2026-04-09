@@ -224,14 +224,13 @@ export function DashboardPage() {
           </Link>
           {jobApplications.length > 0 ? (
             <button
-              className="button-link"
+              className="button-link dashboard-filters-toggle"
               onClick={() => setShowFilters((current) => !current)}
               type="button"
             >
               {showFilters ? "Close filters" : "Open filters"}
             </button>
           ) : null}
-          <p className="dashboard-hero__hint">This entry point is ready for the upcoming create flow.</p>
         </div>
       </section>
 
