@@ -118,7 +118,8 @@ a {
   transition:
     transform 160ms ease,
     border-color 160ms ease,
-    background-color 160ms ease;
+    background-color 160ms ease,
+    opacity 160ms ease;
 }
 
 .app-shell__nav-link:hover,
@@ -130,6 +131,12 @@ a {
 .app-shell__nav-link--active {
   background: var(--color-accent-soft);
   border-color: rgba(13, 148, 136, 0.25);
+}
+
+.button-link:disabled {
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.7;
 }
 
 .app-shell__main {
@@ -154,6 +161,12 @@ a {
 .button-link {
   justify-self: start;
   background: var(--color-surface-strong);
+}
+
+.button-link--primary {
+  color: #ffffff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
 }
 
 .page-stack {
@@ -218,6 +231,15 @@ a {
   color: var(--color-accent-strong);
 }
 
+.feedback-panel--success {
+  border-color: rgba(13, 148, 136, 0.2);
+  background: rgba(241, 253, 250, 0.98);
+}
+
+.feedback-panel--success .feedback-panel__eyebrow {
+  color: var(--color-accent-strong);
+}
+
 .loading-indicator {
   width: 2.75rem;
   height: 2.75rem;
@@ -235,6 +257,72 @@ a {
   to {
     transform: rotate(360deg);
   }
+}
+
+.auth-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-label {
+  font-weight: 700;
+}
+
+.form-input {
+  min-height: 3rem;
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--color-ink);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: rgba(13, 148, 136, 0.5);
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.12);
+}
+
+.form-input[aria-invalid="true"] {
+  border-color: rgba(185, 28, 28, 0.4);
+  background: rgba(255, 248, 247, 0.95);
+}
+
+.form-error,
+.form-hint,
+.auth-form__meta {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.form-error {
+  color: #b91c1c;
+}
+
+.form-hint,
+.auth-form__meta {
+  color: var(--color-muted);
+}
+
+.auth-form__actions {
+  display: grid;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.auth-form__meta a {
+  color: var(--color-accent-strong);
+  font-weight: 700;
 }
 
 @media (max-width: 640px) {
