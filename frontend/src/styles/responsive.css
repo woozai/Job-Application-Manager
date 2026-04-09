@@ -1,0 +1,210 @@
+@media (max-width: 960px) {
+  .app-shell {
+    width: min(100% - 1.5rem, 100%);
+    padding-bottom: 2.5rem;
+  }
+
+  .app-shell__header {
+    padding: 1.5rem;
+  }
+
+  .app-shell__topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-shell__session {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-filters__grid,
+  .job-form__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-job-card__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contacts-table {
+    min-width: 820px;
+  }
+}
+
+@media (max-width: 780px) {
+  .app-shell__nav {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell__nav-group {
+    width: 100%;
+  }
+
+  .app-shell__nav-links {
+    width: 100%;
+  }
+
+  .app-shell__nav-link {
+    flex: 1 1 0;
+  }
+
+  .dashboard-hero,
+  .details-hero,
+  .dashboard-filters__header,
+  .dashboard-section__header,
+  .details-section__header,
+  .feedback-panel__header {
+    align-items: stretch;
+  }
+
+  .dashboard-hero__actions,
+  .details-hero__actions {
+    width: 100%;
+    justify-items: stretch;
+  }
+
+  .details-hero__actions {
+    display: grid;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-job-card {
+    padding: 1.1rem;
+  }
+
+  .contacts-table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    width: min(100% - 1rem, 100%);
+    padding-top: 1rem;
+  }
+
+  .app-shell__header,
+  .page-card {
+    padding: 1.25rem;
+    border-radius: 22px;
+  }
+
+  .app-shell__topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-shell__nav {
+    width: 100%;
+  }
+
+  .app-shell__nav-links {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell__nav-link,
+  .button-link {
+    width: 100%;
+  }
+
+  .app-shell__session {
+    justify-content: stretch;
+    margin-left: 0;
+  }
+
+  .app-shell__profile-trigger {
+    width: 100%;
+    border-radius: 22px;
+  }
+
+  .app-shell__profile-dropdown {
+    left: 0;
+    right: 0;
+  }
+
+  .feedback-panel--loading {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-stats,
+  .dashboard-filters__grid,
+  .dashboard-job-card__meta,
+  .job-form__grid,
+  .details-grid,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-job-card__header,
+  .feedback-panel__action,
+  .dashboard-filters__actions,
+  .job-form__actions,
+  .auth-form__actions,
+  .details-hero__actions,
+  .contacts-table__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contacts-table {
+    min-width: 680px;
+  }
+
+  .contacts-table th,
+  .contacts-table td {
+    padding: 0.8rem 0.65rem;
+  }
+
+  .dashboard-badge,
+  .dashboard-job-card__status,
+  .contacts-status {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .page-stack {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 420px) {
+  html {
+    font-size: 15px;
+  }
+
+  .app-shell__header,
+  .page-card,
+  .feedback-panel {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .app-shell__brand h1,
+  .page-card h2 {
+    line-height: 1.1;
+  }
+
+  .form-input {
+    min-height: 2.85rem;
+    padding-inline: 0.85rem;
+  }
+
+  .contacts-table {
+    min-width: 620px;
+  }
+}
