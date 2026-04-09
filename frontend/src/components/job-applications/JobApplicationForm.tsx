@@ -60,6 +60,7 @@ interface JobApplicationFormProps {
   isSubmitting: boolean;
   submitError: string | null;
   submitLabel: string;
+  submittingLabel?: string;
   title: string;
   description: string;
   onSubmit: (payload: JobApplicationCreateInput) => Promise<void>;
@@ -145,6 +146,7 @@ export function JobApplicationForm({
   isSubmitting,
   submitError,
   submitLabel,
+  submittingLabel = "Saving your application. Please wait...",
   title,
   description,
   onSubmit,
@@ -182,6 +184,10 @@ export function JobApplicationForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+     if (isSubmitting) {
+      return;
+    }
 
     const nextErrors = validateForm(values);
     setErrors(nextErrors);
@@ -550,6 +556,12 @@ export function JobApplicationForm({
           </section>
         ) : null}
 
+        {isSubmitting ? (
+          <p className="form-status" aria-live="polite">
+            {submittingLabel}
+          </p>
+        ) : null}
+
         <div className="job-form__actions">
           <button className="button-link button-link--primary" disabled={isSubmitting} type="submit">
             {isSubmitting ? "Saving..." : submitLabel}
@@ -557,9 +569,15 @@ export function JobApplicationForm({
           <button className="button-link" disabled={isSubmitting} onClick={resetForm} type="button">
             Reset form
           </button>
-          <Link className="button-link" to="/dashboard">
-            Cancel
-          </Link>
+          {isSubmitting ? (
+            <span className="button-link button-link--disabled" aria-disabled="true">
+              Cancel
+            </span>
+          ) : (
+            <Link className="button-link" to="/dashboard">
+              Cancel
+            </Link>
+          )}
         </div>
       </form>
     </section>

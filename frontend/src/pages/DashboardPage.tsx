@@ -35,31 +35,31 @@ export function DashboardPage() {
     }
   }, [location.pathname, location.state]);
 
-  useEffect(() => {
-    async function loadJobApplications() {
-      if (!token) {
-        setJobApplications([]);
-        setIsLoadingApplications(false);
-        return;
-      }
-
-      setIsLoadingApplications(true);
-      setLoadError(null);
-
-      try {
-        const applications = await getJobApplications(token);
-        setJobApplications(applications);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          setLoadError(error.message);
-        } else {
-          setLoadError("We could not load your job applications.");
-        }
-      } finally {
-        setIsLoadingApplications(false);
-      }
+  async function loadJobApplications() {
+    if (!token) {
+      setJobApplications([]);
+      setIsLoadingApplications(false);
+      return;
     }
 
+    setIsLoadingApplications(true);
+    setLoadError(null);
+
+    try {
+      const applications = await getJobApplications(token);
+      setJobApplications(applications);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setLoadError(error.message);
+      } else {
+        setLoadError("We could not load your job applications.");
+      }
+    } finally {
+      setIsLoadingApplications(false);
+    }
+  }
+
+  useEffect(() => {
     void loadJobApplications();
   }, [token]);
 
@@ -374,7 +374,15 @@ export function DashboardPage() {
       ) : null}
 
       {!isLoadingApplications && loadError ? (
-        <ErrorState title="Could not load applications" message={loadError} />
+        <ErrorState
+          title="Could not load applications"
+          message={loadError}
+          action={
+            <button className="button-link" onClick={() => void loadJobApplications()} type="button">
+              Try again
+            </button>
+          }
+        />
       ) : null}
 
       {!isLoadingApplications && !loadError && jobApplications.length === 0 ? (

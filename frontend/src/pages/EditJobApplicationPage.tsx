@@ -21,35 +21,39 @@ export function EditJobApplicationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadJobApplication() {
-      if (!token || !jobApplicationId) {
-        setLoadError("We could not determine which application to edit.");
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setLoadError(null);
-
-      try {
-        const application = await getJobApplication(Number(jobApplicationId), token);
-        setJobApplication(application);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          setLoadError(error.message);
-        } else {
-          setLoadError("We could not load this job application.");
-        }
-      } finally {
-        setIsLoading(false);
-      }
+  async function loadJobApplication() {
+    if (!token || !jobApplicationId) {
+      setLoadError("We could not determine which application to edit.");
+      setIsLoading(false);
+      return;
     }
 
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const application = await getJobApplication(Number(jobApplicationId), token);
+      setJobApplication(application);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setLoadError(error.message);
+      } else {
+        setLoadError("We could not load this job application.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
     void loadJobApplication();
   }, [jobApplicationId, token]);
 
   async function handleUpdate(payload: JobApplicationUpdateInput) {
+    if (isSubmitting) {
+      return;
+    }
+
     if (!token || !jobApplicationId) {
       setSubmitError("We could not determine which application to update.");
       return;
@@ -87,7 +91,17 @@ export function EditJobApplicationPage() {
   }
 
   if (loadError || !jobApplication) {
-    return <ErrorState title="Could not load application" message={loadError ?? "Application not found."} />;
+    return (
+      <ErrorState
+        title="Could not load application"
+        message={loadError ?? "Application not found."}
+        action={
+          <button className="button-link" onClick={() => void loadJobApplication()} type="button">
+            Try again
+          </button>
+        }
+      />
+    );
   }
 
   return (
@@ -98,6 +112,7 @@ export function EditJobApplicationPage() {
       onSubmit={handleUpdate}
       submitError={submitError}
       submitLabel="Save changes"
+      submittingLabel="Saving your updates and refreshing the application details..."
       title={`Edit ${jobApplication.company_name}`}
     />
   );

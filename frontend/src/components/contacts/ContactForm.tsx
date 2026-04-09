@@ -143,6 +143,10 @@ export function ContactForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     const nextErrors = validateForm(values);
     setErrors(nextErrors);
 
@@ -411,6 +415,12 @@ export function ContactForm({
             <h3>{isEditing ? "Contact updated" : "Contact added"}</h3>
             <p>{successMessage}</p>
           </section>
+        ) : null}
+
+        {isSubmitting ? (
+          <p className="form-status" aria-live="polite">
+            {isEditing ? "Saving contact changes..." : "Adding contact..."}
+          </p>
         ) : null}
 
         <div className="job-form__actions">

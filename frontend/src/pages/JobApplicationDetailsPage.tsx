@@ -120,31 +120,31 @@ export function JobApplicationDetailsPage() {
 
   useDocumentTitle("Job Details | Job Application Manager");
 
-  useEffect(() => {
-    async function loadJobDetails() {
-      if (!token || !jobApplicationId) {
-        setLoadError("We could not determine which application to load.");
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setLoadError(null);
-
-      try {
-        const application = await getJobApplication(Number(jobApplicationId), token);
-        setJobApplication(application);
-      } catch (error) {
-        if (error instanceof ApiError) {
-          setLoadError(error.message);
-        } else {
-          setLoadError("We could not load this job application.");
-        }
-      } finally {
-        setIsLoading(false);
-      }
+  async function loadJobDetails() {
+    if (!token || !jobApplicationId) {
+      setLoadError("We could not determine which application to load.");
+      setIsLoading(false);
+      return;
     }
 
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const application = await getJobApplication(Number(jobApplicationId), token);
+      setJobApplication(application);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setLoadError(error.message);
+      } else {
+        setLoadError("We could not load this job application.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
     void loadJobDetails();
   }, [jobApplicationId, token]);
 
@@ -244,12 +244,26 @@ export function JobApplicationDetailsPage() {
   }
 
   if (loadError || !jobApplication) {
-    return <ErrorState title="Could not load application" message={loadError ?? "Application not found."} />;
+    return (
+      <ErrorState
+        title="Could not load application"
+        message={loadError ?? "Application not found."}
+        action={
+          <button className="button-link" onClick={() => void loadJobDetails()} type="button">
+            Try again
+          </button>
+        }
+      />
+    );
   }
 
   const currentJobApplication = jobApplication;
 
   async function handleDelete() {
+    if (isDeleting) {
+      return;
+    }
+
     if (!token || !jobApplicationId) {
       setDeleteError("We could not determine which application to delete.");
       return;
@@ -280,6 +294,10 @@ export function JobApplicationDetailsPage() {
   }
 
   async function handleCreateContact(payload: ContactCreateInput | ContactUpdateInput) {
+    if (isCreatingContact) {
+      return false;
+    }
+
     if (!token) {
       setCreateContactError("You must be signed in to add a contact.");
       return false;
@@ -319,6 +337,10 @@ export function JobApplicationDetailsPage() {
   }
 
   async function handleEditContact(payload: ContactCreateInput | ContactUpdateInput) {
+    if (isSavingEditedContact) {
+      return false;
+    }
+
     if (!token || !editingContact) {
       setEditContactError("We could not determine which contact to update.");
       return false;
@@ -359,6 +381,10 @@ export function JobApplicationDetailsPage() {
   }
 
   async function handleDeleteContact() {
+    if (isDeletingContact) {
+      return;
+    }
+
     if (!token || !contactPendingDelete) {
       setDeleteContactError("We could not determine which contact to delete.");
       return;
