@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { getJobApplications } from "../api/jobApplications";
 import { ApiError } from "../api/client";
@@ -18,7 +18,6 @@ export function DashboardPage() {
   const [jobApplications, setJobApplications] = useState<JobApplicationResponse[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isLoadingApplications, setIsLoadingApplications] = useState(true);
-  const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [companyFilter, setCompanyFilter] = useState("all");
@@ -26,15 +25,6 @@ export function DashboardPage() {
   const [applicationTypeFilter, setApplicationTypeFilter] = useState("all");
   const [dateFromFilter, setDateFromFilter] = useState("");
   const [dateToFilter, setDateToFilter] = useState("");
-  const isCreatePanelOpen = createMessage !== null;
-
-  function toggleCreatePanel() {
-    setCreateMessage((currentMessage) =>
-      currentMessage
-        ? null
-        : "The create application form is the next task and will be connected here.",
-    );
-  }
 
   useEffect(() => {
     const routeState = location.state as { successMessage?: string } | null;
@@ -228,31 +218,12 @@ export function DashboardPage() {
         </div>
 
         <div className="dashboard-hero__actions">
-          <button
-            className="button-link button-link--primary"
-            onClick={toggleCreatePanel}
-            type="button"
-          >
-            {isCreatePanelOpen ? "Close create panel" : "Create new application"}
-          </button>
+          <Link className="button-link button-link--primary" to="/job-applications/new">
+            Create new application
+          </Link>
           <p className="dashboard-hero__hint">This entry point is ready for the upcoming create flow.</p>
         </div>
       </section>
-
-      {createMessage ? (
-        <section className="feedback-panel" role="status">
-          <div className="feedback-panel__header">
-            <div>
-              <p className="feedback-panel__eyebrow">Next step</p>
-              <h3>Create application</h3>
-            </div>
-            <button className="button-link" onClick={toggleCreatePanel} type="button">
-              Close
-            </button>
-          </div>
-          <p>{createMessage}</p>
-        </section>
-      ) : null}
 
       <section className="dashboard-stats" aria-label="Dashboard summary">
         {dashboardStats.map((stat) => (
@@ -414,13 +385,9 @@ export function DashboardPage() {
             Once you start adding jobs, they will show up here with status, dates, and follow-up
             context.
           </p>
-          <button
-            className="button-link button-link--primary"
-            onClick={toggleCreatePanel}
-            type="button"
-          >
-            {isCreatePanelOpen ? "Close create panel" : "Create your first application"}
-          </button>
+          <Link className="button-link button-link--primary" to="/job-applications/new">
+            Create your first application
+          </Link>
         </section>
       ) : null}
 
