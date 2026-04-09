@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { ApiError } from "../api";
 import { createUser } from "../api/users";
@@ -58,12 +58,12 @@ function validateRegisterForm(values: RegisterFormValues) {
 
 export function RegisterPage() {
   useDocumentTitle("Register | Job Application Manager");
+  const navigate = useNavigate();
 
   const [formValues, setFormValues] = useState(initialValues);
   const [formErrors, setFormErrors] = useState<RegisterFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [createdUsername, setCreatedUsername] = useState<string | null>(null);
 
   function updateField<K extends keyof RegisterFormValues>(field: K, value: RegisterFormValues[K]) {
     setFormValues((currentValues) => ({
@@ -89,7 +89,6 @@ export function RegisterPage() {
     const nextErrors = validateRegisterForm(formValues);
     setFormErrors(nextErrors);
     setSubmitError(null);
-    setCreatedUsername(null);
 
     if (Object.keys(nextErrors).length > 0) {
       return;
@@ -104,9 +103,13 @@ export function RegisterPage() {
         password: formValues.password,
       });
 
-      setCreatedUsername(createdUser.username);
-      setFormValues(initialValues);
-      setFormErrors({});
+      navigate("/login", {
+        replace: true,
+        state: {
+          successMessage: `Account created for ${createdUser.username}. You can sign in now.`,
+          registeredEmail: createdUser.email,
+        },
+      });
     } catch (error) {
       if (error instanceof ApiError) {
         setSubmitError(error.message);
@@ -231,14 +234,6 @@ export function RegisterPage() {
           title="Registration failed"
           message={submitError}
         />
-      ) : null}
-
-      {createdUsername ? (
-        <section className="feedback-panel feedback-panel--success" role="status">
-          <p className="feedback-panel__eyebrow">Success</p>
-          <h3>Account created</h3>
-          <p>{createdUsername} is ready. You can move on to login when that flow is in place.</p>
-        </section>
       ) : null}
     </div>
   );
