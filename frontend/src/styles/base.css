@@ -522,6 +522,35 @@ a {
   overflow-x: auto;
 }
 
+.contact-form,
+.contact-form__section,
+.contact-form__header {
+  display: grid;
+}
+
+.contact-form {
+  gap: 1.25rem;
+}
+
+.contact-form__section {
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.contact-form__header {
+  gap: 0.3rem;
+}
+
+.contact-form__header h3,
+.contact-form__header p {
+  margin: 0;
+}
+
+.contact-form__header p {
+  color: var(--color-muted);
+}
+
 .contacts-table {
   width: 100%;
   border-collapse: collapse;

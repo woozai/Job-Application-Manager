@@ -1,13 +1,16 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
+import { createContact } from "../api/contacts";
 import { deleteJobApplication, getJobApplication } from "../api/jobApplications";
+import { ContactForm } from "../components/contacts/ContactForm";
 import { ContactsTable } from "../components/contacts/ContactsTable";
 import { ApiError } from "../api/client";
 import { ErrorState } from "../components/ui/ErrorState";
 import { LoadingState } from "../components/ui/LoadingState";
 import { useAuth } from "../hooks/useAuth";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
+import type { ContactCreateInput } from "../types/contact";
 
 type DetailItemValue = ReactNode;
 
@@ -104,6 +107,10 @@ export function JobApplicationDetailsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCreatingContact, setIsCreatingContact] = useState(false);
+  const [createContactError, setCreateContactError] = useState<string | null>(null);
+  const [createContactSuccessMessage, setCreateContactSuccessMessage] = useState<string | null>(null);
+  const [showCreateContactForm, setShowCreateContactForm] = useState(false);
 
   useDocumentTitle("Job Details | Job Application Manager");
 
@@ -266,6 +273,45 @@ export function JobApplicationDetailsPage() {
     }
   }
 
+  async function handleCreateContact(payload: ContactCreateInput) {
+    if (!token) {
+      setCreateContactError("You must be signed in to add a contact.");
+      return false;
+    }
+
+    setIsCreatingContact(true);
+    setCreateContactError(null);
+    setCreateContactSuccessMessage(null);
+
+    try {
+      const createdContact = await createContact(payload, token);
+
+      setJobApplication((currentJobApplication) => {
+        if (!currentJobApplication) {
+          return currentJobApplication;
+        }
+
+        return {
+          ...currentJobApplication,
+          contacts: [...currentJobApplication.contacts, createdContact],
+        };
+      });
+
+      setCreateContactSuccessMessage(`${createdContact.name} was added to this application.`);
+      setShowCreateContactForm(false);
+      return true;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setCreateContactError(error.message);
+      } else {
+        setCreateContactError("We could not create this contact. Please try again.");
+      }
+      return false;
+    } finally {
+      setIsCreatingContact(false);
+    }
+  }
+
   return (
     <div className="page-stack">
       {routeState?.successMessage ? (
@@ -366,6 +412,44 @@ export function JobApplicationDetailsPage() {
           </dl>
         </section>
       ))}
+
+      {showCreateContactForm ? (
+        <ContactForm
+          isSubmitting={isCreatingContact}
+          jobApplicationId={currentJobApplication.id}
+          onCancel={() => {
+            setShowCreateContactForm(false);
+            setCreateContactError(null);
+            setCreateContactSuccessMessage(null);
+          }}
+          onSubmit={handleCreateContact}
+          submitError={createContactError}
+          successMessage={createContactSuccessMessage}
+        />
+      ) : (
+        <section className="page-card">
+          <p className="page-card__eyebrow">Contacts</p>
+          <div className="details-section__header">
+            <div>
+              <h2>Add a contact</h2>
+              <p className="page-card__body">
+                Open the contact form when you want to add a recruiter, referral, or another connection.
+              </p>
+            </div>
+            <button
+              className="button-link button-link--primary"
+              onClick={() => {
+                setShowCreateContactForm(true);
+                setCreateContactError(null);
+                setCreateContactSuccessMessage(null);
+              }}
+              type="button"
+            >
+              Add contact
+            </button>
+          </div>
+        </section>
+      )}
 
       <ContactsTable contacts={currentJobApplication.contacts} />
 
