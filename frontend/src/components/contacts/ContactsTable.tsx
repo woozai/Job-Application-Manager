@@ -50,6 +50,18 @@ function BooleanIcon({
   );
 }
 
+function EmptyValueIcon({ label }: { label: string }) {
+  return (
+    <span
+      aria-label={label}
+      className="contacts-check contacts-check--empty"
+      role="img"
+    >
+      −
+    </span>
+  );
+}
+
 function getStatusTone(responseStatus: string | null) {
   const normalizedStatus = responseStatus?.trim().toLowerCase();
 
@@ -185,7 +197,7 @@ export function ContactsTable({
                     </div>
                   </td>
                   <td className="contacts-table__notes">
-                    {formatValue(contact.notes, "No notes added")}
+                    {contact.notes?.trim().length ? contact.notes : <EmptyValueIcon label="No notes" />}
                   </td>
                   <td>
                     <div className="contacts-table__stack">
