@@ -455,7 +455,7 @@ export function JobApplicationDetailsPage() {
               Edit application
             </Link>
             <button
-              className="button-link"
+              className="button-link button-link--danger"
               onClick={() => {
                 setShowDeleteConfirm((current) => !current);
                 setDeleteError(null);
@@ -659,7 +659,7 @@ export function JobApplicationDetailsPage() {
           <Link className="button-link button-link--primary" to={`/job-applications/${jobApplicationId}/edit`}>
             Edit application
           </Link>
-          <Link className="button-link" to="/dashboard">
+          <Link className="button-link details-secondary-button" to="/dashboard">
             Back to dashboard
           </Link>
         </div>

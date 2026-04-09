@@ -398,6 +398,11 @@ a {
   border-color: rgba(13, 148, 136, 0.32);
 }
 
+.details-secondary-button {
+  border-width: 2px;
+  border-color: rgba(13, 148, 136, 0.32);
+}
+
 .dashboard-filters__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
