@@ -525,7 +525,7 @@ a {
 .contacts-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+  min-width: 900px;
 }
 
 .contacts-table th,
@@ -541,6 +541,78 @@ a {
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+.contacts-table td {
+  min-width: 0;
+}
+
+.contacts-table__identity,
+.contacts-table__stack {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.contacts-table__identity strong,
+.contacts-empty-state__panel strong {
+  font-size: 0.98rem;
+}
+
+.contacts-table__identity span,
+.contacts-table__subtle,
+.contacts-empty-state__panel p {
+  color: var(--color-muted);
+}
+
+.contacts-table__notes {
+  max-width: 28ch;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.contacts-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: 1.9rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.contacts-status--positive {
+  color: #065f46;
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.contacts-status--negative {
+  color: #991b1b;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.contacts-status--muted {
+  color: #0f766e;
+  background: rgba(13, 148, 136, 0.1);
+}
+
+.contacts-empty-state {
+  align-items: start;
+}
+
+.contacts-empty-state__panel {
+  display: grid;
+  gap: 0.45rem;
+  width: min(100%, 36rem);
+  padding: 1rem 1.1rem;
+  border: 1px dashed rgba(13, 148, 136, 0.28);
+  border-radius: 18px;
+  background: rgba(240, 253, 250, 0.72);
+}
+
+.contacts-empty-state__panel p {
+  margin: 0;
 }
 
 .job-form {
@@ -922,5 +994,9 @@ a {
 
   .details-grid {
     grid-template-columns: 1fr;
+  }
+
+  .contacts-table {
+    min-width: 720px;
   }
 }

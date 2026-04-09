@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import type {
   JobApplicationCreateInput,
   JobApplicationResponse,
-  JobApplicationUpdateInput,
 } from "../../types/jobApplication";
 
 const statusOptions = [
@@ -63,7 +62,7 @@ interface JobApplicationFormProps {
   submitLabel: string;
   title: string;
   description: string;
-  onSubmit: (payload: JobApplicationCreateInput | JobApplicationUpdateInput) => Promise<void>;
+  onSubmit: (payload: JobApplicationCreateInput) => Promise<void>;
 }
 
 function createInitialValues(initialData?: JobApplicationResponse): JobApplicationFormValues {
@@ -113,7 +112,7 @@ function normalizeOptionalValue(value: string) {
   return trimmedValue.length > 0 ? trimmedValue : null;
 }
 
-function buildPayload(values: JobApplicationFormValues): JobApplicationCreateInput | JobApplicationUpdateInput {
+function buildPayload(values: JobApplicationFormValues): JobApplicationCreateInput {
   return {
     company_name: values.company_name.trim(),
     job_title: values.job_title.trim(),

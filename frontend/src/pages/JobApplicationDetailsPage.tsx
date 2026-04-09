@@ -1,13 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { deleteJobApplication, getJobApplication } from "../api/jobApplications";
+import { ContactsTable } from "../components/contacts/ContactsTable";
 import { ApiError } from "../api/client";
 import { ErrorState } from "../components/ui/ErrorState";
 import { LoadingState } from "../components/ui/LoadingState";
 import { useAuth } from "../hooks/useAuth";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
-import type { ContactResponse } from "../types/contact";
+
+type DetailItemValue = ReactNode;
+
+interface DetailSection {
+  title: string;
+  items: Array<{
+    label: string;
+    value: DetailItemValue;
+  }>;
+}
 
 function formatValue(value: string | null | undefined) {
   if (!value || value.trim().length === 0) {
@@ -33,10 +43,6 @@ function formatDateValue(value: string | null | undefined) {
     day: "numeric",
     year: "numeric",
   }).format(date);
-}
-
-function formatBooleanValue(value: boolean) {
-  return value ? "Yes" : "No";
 }
 
 function ExpandableText({
@@ -84,59 +90,6 @@ function getExternalLinkLabel(value: string | null | undefined, fallbackLabel: s
   } catch {
     return fallbackLabel;
   }
-}
-
-function ContactTable({ contacts }: { contacts: ContactResponse[] }) {
-  if (contacts.length === 0) {
-    return (
-      <section className="page-card">
-        <p className="page-card__eyebrow">Contacts</p>
-        <h2>Related contacts</h2>
-        <p className="page-card__body">
-          No contacts have been added to this application yet.
-        </p>
-      </section>
-    );
-  }
-
-  return (
-    <section className="page-card">
-      <p className="page-card__eyebrow">Contacts</p>
-      <div className="details-section__header">
-        <h2>Related contacts</h2>
-        <p className="details-section__meta">{contacts.length} linked to this application</p>
-      </div>
-
-      <div className="contacts-table-wrapper">
-        <table className="contacts-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Relationship</th>
-              <th>Role</th>
-              <th>Company</th>
-              <th>Response</th>
-              <th>Message sent</th>
-              <th>Connection approved</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contacts.map((contact) => (
-              <tr key={contact.id}>
-                <td>{contact.name}</td>
-                <td>{formatValue(contact.relationship_type)}</td>
-                <td>{formatValue(contact.job_title)}</td>
-                <td>{formatValue(contact.company)}</td>
-                <td>{formatValue(contact.response_status)}</td>
-                <td>{formatBooleanValue(contact.message_sent)}</td>
-                <td>{formatBooleanValue(contact.connection_approved)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  );
 }
 
 export function JobApplicationDetailsPage() {
@@ -191,13 +144,13 @@ export function JobApplicationDetailsPage() {
       {
         title: "Basic information",
         items: [
-          ["Company", jobApplication.company_name],
-          ["Job title", jobApplication.job_title],
-          ["Status", formatValue(jobApplication.status)],
-          ["Application date", formatDateValue(jobApplication.application_date)],
-          [
-            "Job link",
-            jobApplication.job_link ? (
+          { label: "Company", value: jobApplication.company_name },
+          { label: "Job title", value: jobApplication.job_title },
+          { label: "Status", value: formatValue(jobApplication.status) },
+          { label: "Application date", value: formatDateValue(jobApplication.application_date) },
+          {
+            label: "Job link",
+            value: jobApplication.job_link ? (
               <a
                 className="details-link"
                 href={jobApplication.job_link}
@@ -210,10 +163,10 @@ export function JobApplicationDetailsPage() {
             ) : (
               "Not set"
             ),
-          ],
-          [
-            "Source link",
-            jobApplication.source_link ? (
+          },
+          {
+            label: "Source link",
+            value: jobApplication.source_link ? (
               <a
                 className="details-link"
                 href={jobApplication.source_link}
@@ -226,37 +179,46 @@ export function JobApplicationDetailsPage() {
             ) : (
               "Not set"
             ),
-          ],
-          ["Source", formatValue(jobApplication.source)],
-          ["Location", formatValue(jobApplication.location)],
+          },
+          { label: "Source", value: formatValue(jobApplication.source) },
+          { label: "Location", value: formatValue(jobApplication.location) },
         ],
       },
       {
         title: "Descriptions and notes",
         items: [
-          ["Short description", <ExpandableText maxLength={180} text={jobApplication.short_description} />],
-          ["Full description", <ExpandableText maxLength={220} text={jobApplication.full_description} />],
-          ["Required skills", <ExpandableText maxLength={180} text={jobApplication.required_skills} />],
-          ["Notes", <ExpandableText maxLength={180} text={jobApplication.notes} />],
-          ["Tags", formatValue(jobApplication.tags)],
+          {
+            label: "Short description",
+            value: <ExpandableText maxLength={180} text={jobApplication.short_description} />,
+          },
+          {
+            label: "Full description",
+            value: <ExpandableText maxLength={220} text={jobApplication.full_description} />,
+          },
+          {
+            label: "Required skills",
+            value: <ExpandableText maxLength={180} text={jobApplication.required_skills} />,
+          },
+          { label: "Notes", value: <ExpandableText maxLength={180} text={jobApplication.notes} /> },
+          { label: "Tags", value: formatValue(jobApplication.tags) },
         ],
       },
       {
         title: "Process tracking",
         items: [
-          ["Work mode", formatValue(jobApplication.work_mode)],
-          ["Application type", formatValue(jobApplication.application_type)],
-          ["Priority", formatValue(jobApplication.priority)],
-          ["Salary range", formatValue(jobApplication.salary_range)],
-          ["Resume version", formatValue(jobApplication.resume_version)],
-          ["Recruiter name", formatValue(jobApplication.recruiter_name)],
-          ["Last follow-up date", formatDateValue(jobApplication.last_follow_up_date)],
-          ["Next action date", formatDateValue(jobApplication.next_action_date)],
-          ["Interview stage", formatValue(jobApplication.interview_stage)],
-          ["Rejection reason", formatValue(jobApplication.rejection_reason)],
+          { label: "Work mode", value: formatValue(jobApplication.work_mode) },
+          { label: "Application type", value: formatValue(jobApplication.application_type) },
+          { label: "Priority", value: formatValue(jobApplication.priority) },
+          { label: "Salary range", value: formatValue(jobApplication.salary_range) },
+          { label: "Resume version", value: formatValue(jobApplication.resume_version) },
+          { label: "Recruiter name", value: formatValue(jobApplication.recruiter_name) },
+          { label: "Last follow-up date", value: formatDateValue(jobApplication.last_follow_up_date) },
+          { label: "Next action date", value: formatDateValue(jobApplication.next_action_date) },
+          { label: "Interview stage", value: formatValue(jobApplication.interview_stage) },
+          { label: "Rejection reason", value: formatValue(jobApplication.rejection_reason) },
         ],
       },
-    ];
+    ] satisfies DetailSection[];
   }, [jobApplication]);
 
   if (isLoading) {
@@ -272,11 +234,15 @@ export function JobApplicationDetailsPage() {
     return <ErrorState title="Could not load application" message={loadError ?? "Application not found."} />;
   }
 
+  const currentJobApplication = jobApplication;
+
   async function handleDelete() {
     if (!token || !jobApplicationId) {
       setDeleteError("We could not determine which application to delete.");
       return;
     }
+
+    const companyName = currentJobApplication.company_name;
 
     setIsDeleting(true);
     setDeleteError(null);
@@ -286,7 +252,7 @@ export function JobApplicationDetailsPage() {
       navigate("/dashboard", {
         replace: true,
         state: {
-          successMessage: `${jobApplication.company_name} was deleted successfully.`,
+          successMessage: `${companyName} was deleted successfully.`,
         },
       });
     } catch (error) {
@@ -314,8 +280,8 @@ export function JobApplicationDetailsPage() {
         <p className="page-card__eyebrow">Job details</p>
         <div className="details-hero">
           <div className="details-hero__content">
-            <p className="dashboard-job-card__company">{jobApplication.company_name}</p>
-            <h2>{jobApplication.job_title}</h2>
+            <p className="dashboard-job-card__company">{currentJobApplication.company_name}</p>
+            <h2>{currentJobApplication.job_title}</h2>
             <p className="page-card__body">
               Review the full job record, process details, and related networking contacts in one place.
             </p>
@@ -356,7 +322,7 @@ export function JobApplicationDetailsPage() {
             </button>
           </div>
           <p>
-            This will permanently remove <strong>{jobApplication.company_name}</strong> from your tracker.
+            This will permanently remove <strong>{currentJobApplication.company_name}</strong> from your tracker.
             This action cannot be undone.
           </p>
           {deleteError ? <p className="form-error">{deleteError}</p> : null}
@@ -391,17 +357,17 @@ export function JobApplicationDetailsPage() {
           </div>
 
           <dl className="details-grid">
-            {section.items.map(([label, value]) => (
-              <div key={label} className="details-grid__item">
-                <dt>{label}</dt>
-                <dd>{value}</dd>
+            {section.items.map((item) => (
+              <div key={item.label} className="details-grid__item">
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
               </div>
             ))}
           </dl>
         </section>
       ))}
 
-      <ContactTable contacts={jobApplication.contacts} />
+      <ContactsTable contacts={currentJobApplication.contacts} />
 
       <section className="page-card">
         <div className="job-form__actions">
