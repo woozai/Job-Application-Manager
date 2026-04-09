@@ -3,12 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import EmailStr, Field
-
-from app.schemas.base import BaseSchema
+from pydantic import EmailStr, Field, BaseModel
 
 
-class UserBase(BaseSchema):
+class UserBase(BaseModel):
     username: str = Field(
         ..., min_length=1, max_length=100, description="Unique username for the user"
     )
@@ -21,15 +19,15 @@ class UserCreate(UserBase):
     )
 
 
-class UserUpdate(BaseSchema):
-    username: Optional[str] = Field(
-        None, min_length=1, max_length=100, description="Unique username for the user"
+class UserUpdate(BaseModel):
+    username: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=50,
+        description="Unique username for the user",
     )
-    email: Optional[EmailStr] = Field(
-        None, max_length=255, description="User's email address"
-    )
-    password: Optional[str] = Field(
-        None, min_length=8, max_length=255, description="Password for the user account"
+    email: EmailStr | None = Field(
+        default=None, max_length=120, description="User's email address"
     )
 
 
@@ -41,6 +39,6 @@ class UserResponse(UserBase):
     )
 
 
-class Token(BaseSchema):
+class Token(BaseModel):
     access_token: str = Field(..., description="JWT access token")
     token_type: str = Field(..., description="Token type")
