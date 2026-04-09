@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
-import { getJobApplication } from "../api/jobApplications";
+import { deleteJobApplication, getJobApplication } from "../api/jobApplications";
 import { ApiError } from "../api/client";
 import { ErrorState } from "../components/ui/ErrorState";
 import { LoadingState } from "../components/ui/LoadingState";
@@ -142,12 +142,15 @@ function ContactTable({ contacts }: { contacts: ContactResponse[] }) {
 export function JobApplicationDetailsPage() {
   const { jobApplicationId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { token } = useAuth();
   const routeState = location.state as { successMessage?: string } | null;
   const [jobApplication, setJobApplication] = useState<Awaited<ReturnType<typeof getJobApplication>> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [showDeleteNotice, setShowDeleteNotice] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useDocumentTitle("Job Details | Job Application Manager");
 
@@ -269,6 +272,34 @@ export function JobApplicationDetailsPage() {
     return <ErrorState title="Could not load application" message={loadError ?? "Application not found."} />;
   }
 
+  async function handleDelete() {
+    if (!token || !jobApplicationId) {
+      setDeleteError("We could not determine which application to delete.");
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      await deleteJobApplication(Number(jobApplicationId), token);
+      navigate("/dashboard", {
+        replace: true,
+        state: {
+          successMessage: `${jobApplication.company_name} was deleted successfully.`,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setDeleteError(error.message);
+      } else {
+        setDeleteError("We could not delete this job application. Please try again.");
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className="page-stack">
       {routeState?.successMessage ? (
@@ -294,28 +325,59 @@ export function JobApplicationDetailsPage() {
             <Link className="button-link button-link--primary" to={`/job-applications/${jobApplicationId}/edit`}>
               Edit application
             </Link>
-            <button className="button-link" onClick={() => setShowDeleteNotice((current) => !current)} type="button">
-              {showDeleteNotice ? "Close delete action" : "Delete application"}
+            <button
+              className="button-link"
+              onClick={() => {
+                setShowDeleteConfirm((current) => !current);
+                setDeleteError(null);
+              }}
+              type="button"
+            >
+              {showDeleteConfirm ? "Close delete action" : "Delete application"}
             </button>
           </div>
         </div>
       </section>
 
-      {showDeleteNotice ? (
+      {showDeleteConfirm ? (
         <section className="feedback-panel feedback-panel--error" role="alert">
           <div className="feedback-panel__header">
             <div>
               <p className="feedback-panel__eyebrow">Delete action</p>
-              <h3>Delete flow comes next</h3>
+              <h3>Delete this application?</h3>
             </div>
-            <button className="button-link" onClick={() => setShowDeleteNotice(false)} type="button">
+            <button
+              className="button-link"
+              disabled={isDeleting}
+              onClick={() => setShowDeleteConfirm(false)}
+              type="button"
+            >
               Close
             </button>
           </div>
           <p>
-            The delete action is now visible on the details page. We will connect the confirmation
-            and backend delete request in the next dedicated task.
+            This will permanently remove <strong>{jobApplication.company_name}</strong> from your tracker.
+            This action cannot be undone.
           </p>
+          {deleteError ? <p className="form-error">{deleteError}</p> : null}
+          <div className="feedback-panel__action">
+            <button
+              className="button-link button-link--danger"
+              disabled={isDeleting}
+              onClick={handleDelete}
+              type="button"
+            >
+              {isDeleting ? "Deleting..." : "Confirm delete"}
+            </button>
+            <button
+              className="button-link"
+              disabled={isDeleting}
+              onClick={() => setShowDeleteConfirm(false)}
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
         </section>
       ) : null}
 

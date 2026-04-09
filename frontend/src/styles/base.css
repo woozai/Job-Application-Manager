@@ -300,6 +300,12 @@ a {
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
 }
 
+.button-link--danger {
+  color: #ffffff;
+  border-color: transparent;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
 .page-stack {
   display: grid;
   gap: 1.5rem;
