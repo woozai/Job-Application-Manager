@@ -1,0 +1,17 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  --color-ink: #172033;
+  --color-muted: #5d6781;
+  --color-surface: rgba(255, 255, 255, 0.88);
+  --color-surface-strong: #ffffff;
+  --color-border: rgba(23, 32, 51, 0.12);
+  --color-accent: #0d9488;
+  --color-accent-strong: #0f766e;
+  --color-accent-soft: rgba(13, 148, 136, 0.12);
+  --color-background-top: #f4efe4;
+  --color-background-bottom: #d8ebf3;
+  --shadow-lg: 0 30px 60px rgba(23, 32, 51, 0.12);
+}
