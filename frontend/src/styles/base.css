@@ -76,6 +76,30 @@ a {
 }
 
 .app-shell__nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.app-shell__nav-group {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.app-shell__nav-group-label {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.app-shell__nav-links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
@@ -132,6 +156,87 @@ a {
   background: var(--color-surface-strong);
 }
 
+.page-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.feedback-panel {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 24px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.feedback-panel h3,
+.feedback-panel p {
+  margin: 0;
+}
+
+.feedback-panel p:last-child {
+  color: var(--color-muted);
+}
+
+.feedback-panel__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.feedback-panel__action {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.feedback-panel--loading {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.feedback-panel--error {
+  border-color: rgba(185, 28, 28, 0.18);
+  background: rgba(255, 248, 247, 0.95);
+}
+
+.feedback-panel--error .feedback-panel__eyebrow {
+  color: #b91c1c;
+}
+
+.feedback-panel--loading .feedback-panel__eyebrow {
+  color: var(--color-accent-strong);
+}
+
+.loading-indicator {
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 3px solid rgba(13, 148, 136, 0.18);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: loading-spin 900ms linear infinite;
+}
+
+@keyframes loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 640px) {
   .app-shell {
     width: min(100% - 1rem, 100%);
@@ -142,5 +247,9 @@ a {
   .page-card {
     padding: 1.25rem;
     border-radius: 22px;
+  }
+
+  .feedback-panel--loading {
+    grid-template-columns: 1fr;
   }
 }

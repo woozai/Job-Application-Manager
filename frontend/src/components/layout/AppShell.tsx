@@ -1,9 +1,17 @@
 import { NavLink, Outlet } from "react-router-dom";
 
-const navigationLinks = [
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/login", label: "Login" },
-  { to: "/register", label: "Register" },
+const navigationGroups = [
+  {
+    label: "Workspace",
+    links: [{ to: "/dashboard", label: "Dashboard" }],
+  },
+  {
+    label: "Account",
+    links: [
+      { to: "/login", label: "Login" },
+      { to: "/register", label: "Register" },
+    ],
+  },
 ];
 
 export function AppShell() {
@@ -19,16 +27,26 @@ export function AppShell() {
         </div>
 
         <nav aria-label="Primary" className="app-shell__nav">
-          {navigationLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              className={({ isActive }) =>
-                isActive ? "app-shell__nav-link app-shell__nav-link--active" : "app-shell__nav-link"
-              }
-              to={link.to}
-            >
-              {link.label}
-            </NavLink>
+          {navigationGroups.map((group) => (
+            <section key={group.label} className="app-shell__nav-group">
+              <p className="app-shell__nav-group-label">{group.label}</p>
+
+              <div className="app-shell__nav-links">
+                {group.links.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    className={({ isActive }) =>
+                      isActive
+                        ? "app-shell__nav-link app-shell__nav-link--active"
+                        : "app-shell__nav-link"
+                    }
+                    to={link.to}
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+              </div>
+            </section>
           ))}
         </nav>
       </header>
