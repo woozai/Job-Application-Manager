@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.auth import CurrentUser
@@ -37,8 +37,8 @@ async def create_contact_endpoint(
 @router.get("/", response_model=list[ContactResponse])
 async def read_contacts(
     current_user: CurrentUser,
-    skip: int = 0,
-    limit: int = 100,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> list[Contact]:
     return get_contacts_for_user(db, user_id=current_user.id, skip=skip, limit=limit)
@@ -62,8 +62,8 @@ async def read_contact(
 async def read_contacts_by_job_application(
     job_application_id: int,
     current_user: CurrentUser,
-    skip: int = 0,
-    limit: int = 100,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> list[Contact]:
     job_application = get_job_application_for_user(

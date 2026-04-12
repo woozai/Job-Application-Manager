@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.auth import CurrentUser
@@ -32,11 +32,25 @@ async def create_job_application_endpoint(
 @router.get("/", response_model=list[JobApplicationResponse])
 async def read_job_applications(
     current_user: CurrentUser,
-    skip: int = 0,
-    limit: int = 100,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> list[JobApplication]:
     return get_job_applications_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
+
+
+@router.get("/user/{user_id}", response_model=list[JobApplicationResponse])
+async def read_job_applications_by_user(
+    user_id: int,
+    current_user: CurrentUser,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=100),
+    db: Session = Depends(get_db),
+) -> list[JobApplication]:
+    if user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view these job applications")
+
+    return get_job_applications_by_user(db, user_id=user_id, skip=skip, limit=limit)
 
 
 @router.get("/{job_application_id}", response_model=JobApplicationResponse)
@@ -53,20 +67,6 @@ async def read_job_application(
     if db_job_application is None:
         raise HTTPException(status_code=404, detail="Job application not found")
     return db_job_application
-
-
-@router.get("/user/{user_id}", response_model=list[JobApplicationResponse])
-async def read_job_applications_by_user(
-    user_id: int,
-    current_user: CurrentUser,
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db),
-) -> list[JobApplication]:
-    if user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to view these job applications")
-
-    return get_job_applications_by_user(db, user_id=user_id, skip=skip, limit=limit)
 
 
 @router.put("/{job_application_id}", response_model=JobApplicationResponse)

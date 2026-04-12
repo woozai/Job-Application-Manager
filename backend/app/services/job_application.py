@@ -3,6 +3,11 @@ from sqlalchemy.orm import Session
 from app.models.job_application import JobApplication
 from app.schemas.job_application import JobApplicationCreate, JobApplicationUpdate
 
+# SQL injection guardrail:
+# Keep user input inside SQLAlchemy expressions and bound parameters.
+# If search/filter/sort is added here later, do not concatenate raw SQL strings.
+# For sorting, map client keys through an explicit whitelist of model columns.
+
 
 def get_job_application(db: Session, job_application_id: int) -> JobApplication | None:
     return (
