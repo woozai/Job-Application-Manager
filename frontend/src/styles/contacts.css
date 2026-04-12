@@ -66,6 +66,17 @@
   border-color: var(--color-border);
 }
 
+.contacts-table__link {
+  color: var(--color-accent-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.contacts-table__link:hover {
+  color: var(--color-accent);
+}
+
 .contacts-check {
   display: inline-grid;
   place-items: center;

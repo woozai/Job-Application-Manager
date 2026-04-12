@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import type { ContactResponse } from "../../types/contact";
 
 function formatValue(value: string | null | undefined, fallback = "Not set") {
@@ -153,7 +155,11 @@ export function ContactsTable({
                 <tr key={contact.id}>
                   <td>
                     <div className="contacts-table__identity">
-                      <strong>{contact.name}</strong>
+                      <strong>
+                        <Link className="contacts-table__link" to={`/contacts/${contact.id}`}>
+                          {contact.name}
+                        </Link>
+                      </strong>
                       <span>
                         {formatValue(
                           [contact.job_title, contact.company].filter(Boolean).join(" at "),
