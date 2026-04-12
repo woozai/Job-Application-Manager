@@ -5,11 +5,12 @@ import { getContact } from "../api/contacts";
 import { ApiError } from "../api/client";
 import { ContactDetailsSections } from "../components/contacts/ContactDetailsSections";
 import { ErrorState } from "../components/ui/ErrorState";
+import { ExternalLink } from "../components/ui/ExternalLink";
 import { LoadingState } from "../components/ui/LoadingState";
 import { useAuth } from "../hooks/useAuth";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import type { ContactResponse } from "../types/contact";
-import { formatDisplayValue } from "../utils/display";
+import { formatDisplayValue, getSafeExternalUrl } from "../utils/display";
 
 export function ContactDetailsPage() {
   const { contactId } = useParams();
@@ -90,15 +91,12 @@ export function ContactDetailsPage() {
           </div>
 
           <div className="details-hero__actions">
-            {contact.profile_link ? (
-              <a
+            {getSafeExternalUrl(contact.profile_link) ? (
+              <ExternalLink
                 className="button-link button-link--primary"
-                href={contact.profile_link}
-                rel="noreferrer"
-                target="_blank"
-              >
-                Open profile
-              </a>
+                label="Open profile"
+                url={contact.profile_link}
+              />
             ) : null}
             <Link className="button-link details-secondary-button" to={`/job-applications/${contact.job_application_id}`}>
               Back to job

@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 
 import type { ContactResponse } from "../../types/contact";
-import { formatDisplayDate, formatDisplayValue, getExternalLinkLabel } from "../../utils/display";
+import { formatDisplayDate, formatDisplayValue } from "../../utils/display";
 import { ExpandableText } from "../ui/ExpandableText";
+import { ExternalLink } from "../ui/ExternalLink";
 
 interface ContactDetailSection {
   title: string;
@@ -28,19 +29,7 @@ function createContactDetailSections(contact: ContactResponse): ContactDetailSec
         { label: "Job title", value: formatDisplayValue(contact.job_title) },
         {
           label: "Profile link",
-          value: contact.profile_link ? (
-            <a
-              className="details-link"
-              href={contact.profile_link}
-              rel="noreferrer"
-              target="_blank"
-              title={contact.profile_link}
-            >
-              {getExternalLinkLabel(contact.profile_link, "Open profile link")}
-            </a>
-          ) : (
-            "Not set"
-          ),
+          value: <ExternalLink fallback="Not set" url={contact.profile_link} />,
         },
       ],
     },
