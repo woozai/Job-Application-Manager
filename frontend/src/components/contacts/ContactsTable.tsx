@@ -201,7 +201,7 @@ export function ContactsTable({
                   </td>
                   <td>
                     <div className="contacts-table__stack">
-                      <span>{formatDateValue(contact.last_interaction_date)}</span>
+                      <span>{contact.last_interaction_date ? formatDateValue(contact.last_interaction_date) : ""}</span>
                       {contact.connection_requested_at ? (
                         <span className="contacts-table__subtle">
                           Requested {formatDateValue(contact.connection_requested_at)}
