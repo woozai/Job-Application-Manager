@@ -3,10 +3,11 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import List, Optional
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from app.schemas.base import BaseSchema
 from app.schemas.contact import ContactResponse
+from app.schemas.validators import validate_optional_http_url
 
 
 class JobApplicationBase(BaseSchema):
@@ -69,6 +70,11 @@ class JobApplicationBase(BaseSchema):
     tags: Optional[str] = Field(
         None, description="Tags associated with the application"
     )
+
+    @field_validator("job_link", "source_link", mode="before")
+    @classmethod
+    def validate_external_links(cls, value: object) -> str | None:
+        return validate_optional_http_url(value)
 
 
 class JobApplicationCreate(JobApplicationBase):
@@ -139,6 +145,13 @@ class JobApplicationUpdate(BaseSchema):
     tags: Optional[str] = Field(
         None, description="Tags associated with the application"
     )
+
+    @field_validator("job_link", "source_link", mode="before")
+    @classmethod
+    def validate_external_links(cls, value: object) -> str | None:
+        return validate_optional_http_url(value)
+
+
 class JobApplicationResponse(JobApplicationBase):
     id: int = Field(..., description="Unique identifier for the job application")
     user_id: int = Field(..., description="ID of the user who owns the application")
