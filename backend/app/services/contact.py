@@ -4,6 +4,11 @@ from app.models.contact import Contact
 from app.models.job_application import JobApplication
 from app.schemas.contact import ContactCreate, ContactUpdate
 
+# SQL injection guardrail:
+# Keep user input inside SQLAlchemy expressions and bound parameters.
+# If search/filter/sort is added here later, do not concatenate raw SQL strings.
+# For sorting, map client keys through an explicit whitelist of model columns.
+
 
 def get_contact(db: Session, contact_id: int) -> Contact | None:
     return db.query(Contact).filter(Contact.id == contact_id).first()
