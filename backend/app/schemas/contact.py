@@ -3,9 +3,10 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from app.schemas.base import BaseSchema
+from app.schemas.validators import validate_optional_http_url
 
 
 class ContactBase(BaseSchema):
@@ -45,6 +46,11 @@ class ContactBase(BaseSchema):
         None, description="Date of last interaction"
     )
     notes: Optional[str] = Field(None, description="Additional notes about the contact")
+
+    @field_validator("profile_link", mode="before")
+    @classmethod
+    def validate_profile_link(cls, value: object) -> str | None:
+        return validate_optional_http_url(value)
 
 
 class ContactCreate(ContactBase):
@@ -93,6 +99,11 @@ class ContactUpdate(BaseSchema):
     job_application_id: Optional[int] = Field(
         None, description="ID of the associated job application"
     )
+
+    @field_validator("profile_link", mode="before")
+    @classmethod
+    def validate_profile_link(cls, value: object) -> str | None:
+        return validate_optional_http_url(value)
 
 
 class ContactResponse(ContactBase):

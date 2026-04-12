@@ -1,19 +1,42 @@
 .codex*
-frontend/node_modules
-frontend/dist
-frontend/.env
-backend/.venv
-backend/job_applications.db
-backend/.pytest_cache
-backend/__pycache__
-backend/app/**/__pycache__
-backend/tests/**/__pycache__
-backend/**/__pycache__
-backend/**/*.pyc
-frontend/AGENTS.md
 
+# Local environment files
+.env
+*.env.local
+frontend/.env
+backend/.env
+
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+frontend/*.tsbuildinfo
+frontend/tsconfig*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# Backend local environment and generated files
+backend/.venv/
+backend/job_applications.db
+backend/*.db
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.coverage
+backend/htmlcov/
+backend/**/__pycache__/
+backend/**/*.py[cod]
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Local agent/project notes
+frontend/AGENTS.md
 backend/AGENTS.md
 AGENTS.md
 SPEC.md
 TASKS.md
-.env

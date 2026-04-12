@@ -25,14 +25,29 @@ export function formatDisplayDate(value: string | null | undefined) {
 }
 
 export function getExternalLinkLabel(value: string | null | undefined, fallbackLabel: string) {
-  if (!value || value.trim().length === 0) {
+  const safeUrl = getSafeExternalUrl(value);
+
+  if (!safeUrl) {
     return "Not set";
   }
 
   try {
-    const url = new URL(value);
+    const url = new URL(safeUrl);
     return url.hostname.replace(/^www\./, "");
   } catch {
     return fallbackLabel;
+  }
+}
+
+export function getSafeExternalUrl(value: string | null | undefined) {
+  if (!value || value.trim().length === 0) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : null;
+  } catch {
+    return null;
   }
 }

@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 
 import { ExpandableText } from "../ui/ExpandableText";
 import type { JobApplicationResponse } from "../../types/jobApplication";
-import { formatDisplayDate, formatDisplayValue, getExternalLinkLabel } from "../../utils/display";
+import { formatDisplayDate, formatDisplayValue } from "../../utils/display";
+import { ExternalLink } from "../ui/ExternalLink";
 
 interface DetailSection {
   title: string;
@@ -23,35 +24,11 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
         { label: "Application date", value: formatDisplayDate(jobApplication.application_date) },
         {
           label: "Job link",
-          value: jobApplication.job_link ? (
-            <a
-              className="details-link"
-              href={jobApplication.job_link}
-              rel="noreferrer"
-              target="_blank"
-              title={jobApplication.job_link}
-            >
-              {getExternalLinkLabel(jobApplication.job_link, "Open job link")}
-            </a>
-          ) : (
-            "Not set"
-          ),
+          value: <ExternalLink fallback="Not set" url={jobApplication.job_link} />,
         },
         {
           label: "Source link",
-          value: jobApplication.source_link ? (
-            <a
-              className="details-link"
-              href={jobApplication.source_link}
-              rel="noreferrer"
-              target="_blank"
-              title={jobApplication.source_link}
-            >
-              {getExternalLinkLabel(jobApplication.source_link, "Open source link")}
-            </a>
-          ) : (
-            "Not set"
-          ),
+          value: <ExternalLink fallback="Not set" url={jobApplication.source_link} />,
         },
         { label: "Source", value: formatDisplayValue(jobApplication.source) },
         { label: "Location", value: formatDisplayValue(jobApplication.location) },
