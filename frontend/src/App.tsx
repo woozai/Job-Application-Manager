@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { PublicOnlyRoute } from "./components/auth/PublicOnlyRoute";
 import { AppShell } from "./components/layout/AppShell";
 import { AuthProvider } from "./hooks/useAuth";
+import { ContactDetailsPage } from "./pages/ContactDetailsPage";
 import { CreateJobApplicationPage } from "./pages/CreateJobApplicationPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { EditJobApplicationPage } from "./pages/EditJobApplicationPage";
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/job-applications/new" element={<CreateJobApplicationPage />} />
             <Route path="/job-applications/:jobApplicationId" element={<JobApplicationDetailsPage />} />
             <Route path="/job-applications/:jobApplicationId/edit" element={<EditJobApplicationPage />} />
+            <Route path="/contacts/:contactId" element={<ContactDetailsPage />} />
           </Route>
           <Route element={<PublicOnlyRoute />}>
             <Route path="/login" element={<LoginPage />} />
