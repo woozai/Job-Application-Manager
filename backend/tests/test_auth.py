@@ -51,6 +51,44 @@ def test_register_and_login_and_read_current_user(client: TestClient) -> None:
     assert me_response.json()["email"] == "lior@example.com"
 
 
+def test_login_returns_refresh_token_and_can_refresh_session(client: TestClient) -> None:
+    register_user(client, username="lior", email="lior@example.com")
+
+    login_response = client.post(
+        "/users/token",
+        data={"username": "lior@example.com", "password": "password123"},
+    )
+    refresh_token = login_response.json()["refresh_token"]
+
+    refresh_response = client.post(
+        "/users/refresh",
+        json={"refresh_token": refresh_token},
+    )
+
+    assert login_response.status_code == 200
+    assert login_response.json()["access_token"]
+    assert refresh_token
+    assert refresh_response.status_code == 200
+    assert refresh_response.json()["access_token"]
+    assert refresh_response.json()["refresh_token"]
+    assert refresh_response.json()["token_type"] == "bearer"
+
+
+def test_refresh_token_cannot_access_protected_routes(client: TestClient) -> None:
+    register_user(client, username="lior", email="lior@example.com")
+
+    login_response = client.post(
+        "/users/token",
+        data={"username": "lior@example.com", "password": "password123"},
+    )
+    refresh_token = login_response.json()["refresh_token"]
+
+    response = client.get("/users/me", headers=auth_headers(refresh_token))
+
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Invalid or expired token"}
+
+
 def test_login_rejects_invalid_password(client: TestClient) -> None:
     register_user(client, username="lior", email="lior@example.com")
 

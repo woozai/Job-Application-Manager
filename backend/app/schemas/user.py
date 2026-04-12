@@ -41,4 +41,9 @@ class UserResponse(UserBase):
 
 class Token(BaseModel):
     access_token: str = Field(..., description="JWT access token")
+    refresh_token: str = Field(..., description="JWT refresh token")
     token_type: str = Field(..., description="Token type")
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str = Field(..., min_length=1, description="JWT refresh token")

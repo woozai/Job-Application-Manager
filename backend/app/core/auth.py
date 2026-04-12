@@ -25,14 +25,14 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(
-    data: dict[str, object], expires_delta: timedelta | None = None
+def create_token(
+    data: dict[str, object],
+    token_type: str,
+    expires_delta: timedelta,
 ) -> str:
     to_encode = data.copy()
-    expire = datetime.now(UTC) + (
-        expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
-    )
-    to_encode.update({"exp": expire})
+    expire = datetime.now(UTC) + expires_delta
+    to_encode.update({"exp": expire, "type": token_type})
     return jwt.encode(
         to_encode,
         settings.secret_key.get_secret_value(),
@@ -40,17 +40,49 @@ def create_access_token(
     )
 
 
-def verify_access_token(token: str) -> str | None:
+def create_access_token(
+    data: dict[str, object], expires_delta: timedelta | None = None
+) -> str:
+    return create_token(
+        data=data,
+        token_type="access",
+        expires_delta=expires_delta
+        or timedelta(minutes=settings.access_token_expire_minutes),
+    )
+
+
+def create_refresh_token(
+    data: dict[str, object], expires_delta: timedelta | None = None
+) -> str:
+    return create_token(
+        data=data,
+        token_type="refresh",
+        expires_delta=expires_delta
+        or timedelta(minutes=settings.refresh_token_expire_minutes),
+    )
+
+
+def verify_token(token: str, expected_type: str) -> str | None:
     try:
         payload = jwt.decode(
             token,
             settings.secret_key.get_secret_value(),
             algorithms=[settings.algorithm],
-            options={"require": ["exp", "sub"]},
+            options={"require": ["exp", "sub", "type"]},
         )
     except jwt.InvalidTokenError:
         return None
+    if payload.get("type") != expected_type:
+        return None
     return payload.get("sub")
+
+
+def verify_access_token(token: str) -> str | None:
+    return verify_token(token, expected_type="access")
+
+
+def verify_refresh_token(token: str) -> str | None:
+    return verify_token(token, expected_type="refresh")
 
 
 def get_current_user(

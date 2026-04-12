@@ -7,7 +7,7 @@ import {
 } from "react";
 
 import { ApiError } from "../api/client";
-import { getCurrentUser, loginUser } from "../api/users";
+import { getCurrentUser, loginUser, refreshAccessToken } from "../api/users";
 
 import type { UserSummary } from "../types/auth";
 
@@ -24,6 +24,7 @@ interface AuthContextValue {
 
 interface StoredSession {
   accessToken: string;
+  refreshToken: string;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -52,28 +53,73 @@ function writeStoredSession(session: StoredSession | null) {
   window.localStorage.removeItem(sessionStorageKey);
 }
 
+function getTokenExpirationMs(token: string) {
+  const [, payload] = token.split(".");
+
+  if (!payload) {
+    return null;
+  }
+
+  try {
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayload = normalizedPayload.padEnd(
+      normalizedPayload.length + ((4 - (normalizedPayload.length % 4)) % 4),
+      "=",
+    );
+    const decodedPayload = JSON.parse(window.atob(paddedPayload)) as { exp?: unknown };
+    return typeof decodedPayload.exp === "number" ? decodedPayload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<UserSummary | null>(null);
   const [isLoadingSession, setIsLoadingSession] = useState(true);
+
+  async function applySession(accessToken: string, nextRefreshToken: string) {
+    const user = await getCurrentUser(accessToken);
+
+    writeStoredSession({
+      accessToken,
+      refreshToken: nextRefreshToken,
+    });
+    setToken(accessToken);
+    setRefreshToken(nextRefreshToken);
+    setCurrentUser(user);
+  }
+
+  async function refreshSession(nextRefreshToken: string) {
+    const refreshedSession = await refreshAccessToken(nextRefreshToken);
+    await applySession(refreshedSession.access_token, refreshedSession.refresh_token);
+  }
+
+  function clearSession() {
+    writeStoredSession(null);
+    setToken(null);
+    setRefreshToken(null);
+    setCurrentUser(null);
+  }
 
   useEffect(() => {
     async function hydrateSession() {
       const storedSession = readStoredSession();
 
-      if (!storedSession?.accessToken) {
+      if (!storedSession?.accessToken || !storedSession.refreshToken) {
         setIsLoadingSession(false);
         return;
       }
 
       try {
-        const user = await getCurrentUser(storedSession.accessToken);
-        setToken(storedSession.accessToken);
-        setCurrentUser(user);
+        await applySession(storedSession.accessToken, storedSession.refreshToken);
       } catch {
-        writeStoredSession(null);
-        setToken(null);
-        setCurrentUser(null);
+        try {
+          await refreshSession(storedSession.refreshToken);
+        } catch {
+          clearSession();
+        }
       } finally {
         setIsLoadingSession(false);
       }
@@ -84,18 +130,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     const session = await loginUser({ email, password });
-    const user = await getCurrentUser(session.access_token);
-
-    writeStoredSession({ accessToken: session.access_token });
-    setToken(session.access_token);
-    setCurrentUser(user);
+    await applySession(session.access_token, session.refresh_token);
   }
 
   function logout() {
-    writeStoredSession(null);
-    setToken(null);
-    setCurrentUser(null);
+    clearSession();
   }
+
+  useEffect(() => {
+    if (!token || !refreshToken) {
+      return;
+    }
+
+    const expiresAt = getTokenExpirationMs(token);
+
+    if (!expiresAt) {
+      clearSession();
+      return;
+    }
+
+    const oneMinuteBeforeExpiration = 60 * 1000;
+    const refreshDelay = Math.max(expiresAt - Date.now() - oneMinuteBeforeExpiration, 0);
+    const timeoutId = window.setTimeout(() => {
+      void refreshSession(refreshToken).catch(() => {
+        clearSession();
+      });
+    }, refreshDelay);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [refreshToken, token]);
 
   const value: AuthContextValue = {
     currentUser,

@@ -26,6 +26,15 @@ export function loginUser(credentials: LoginCredentials) {
   });
 }
 
+export function refreshAccessToken(refreshToken: string) {
+  return apiRequest<AccessToken>("/users/refresh", {
+    method: "POST",
+    body: {
+      refresh_token: refreshToken,
+    },
+  });
+}
+
 export function getCurrentUser(token: string) {
   return apiRequest<UserSummary>("/users/me", { token });
 }
