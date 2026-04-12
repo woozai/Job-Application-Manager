@@ -4,11 +4,22 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.core.auth import CurrentUser, create_access_token
+from app.core.auth import (
+    CurrentUser,
+    create_access_token,
+    create_refresh_token,
+    verify_refresh_token,
+)
 from app.core.config import settings
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import Token, UserCreate, UserResponse, UserUpdate
+from app.schemas.user import (
+    RefreshTokenRequest,
+    Token,
+    UserCreate,
+    UserResponse,
+    UserUpdate,
+)
 from app.services.user import (
     authenticate_user,
     create_user,
@@ -20,6 +31,22 @@ from app.services.user import (
 )
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+def create_session_tokens(user: User) -> Token:
+    access_token = create_access_token(
+        data={"sub": str(user.id)},
+        expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
+    )
+    refresh_token = create_refresh_token(
+        data={"sub": str(user.id)},
+        expires_delta=timedelta(minutes=settings.refresh_token_expire_minutes),
+    )
+    return Token(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+    )
 
 
 @router.post("/", response_model=UserResponse)
@@ -44,12 +71,40 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires,
-    )
-    return Token(access_token=access_token, token_type="bearer")
+    return create_session_tokens(user)
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_access_token(
+    refresh_request: RefreshTokenRequest,
+    db: Session = Depends(get_db),
+) -> Token:
+    user_id = verify_refresh_token(refresh_request.refresh_token)
+    if user_id is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        user_id_int = int(user_id)
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+
+    user = get_user(db, user_id=user_id_int)
+    if user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return create_session_tokens(user)
 
 
 @router.get("/me", response_model=UserResponse)
