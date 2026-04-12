@@ -173,7 +173,7 @@ export function ContactsTable({
                   <td>
                     <div className="contacts-table__stack">
                       <span className={`contacts-status contacts-status--${responseTone}`}>
-                        {formatValue(contact.response_status, "Awaiting response")}
+                        {formatValue(contact.response_status)}
                       </span>
                     </div>
                   </td>
@@ -202,9 +202,11 @@ export function ContactsTable({
                   <td>
                     <div className="contacts-table__stack">
                       <span>{formatDateValue(contact.last_interaction_date)}</span>
-                      <span className="contacts-table__subtle">
-                        Requested {formatDateValue(contact.connection_requested_at)}
-                      </span>
+                      {contact.connection_requested_at ? (
+                        <span className="contacts-table__subtle">
+                          Requested {formatDateValue(contact.connection_requested_at)}
+                        </span>
+                      ) : null}
                     </div>
                   </td>
                   <td>
