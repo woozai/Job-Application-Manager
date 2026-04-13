@@ -45,7 +45,7 @@ function createContactDetailSections(contact: ContactResponse): ContactDetailSec
         { label: "Message sent", value: formatBoolean(contact.message_sent, "Message sent", "Not sent") },
         { label: "Message date", value: formatDisplayDate(contact.message_sent_at) },
         { label: "Response status", value: formatDisplayValue(contact.response_status) },
-        { label: "Last interaction", value: formatDisplayDate(contact.last_interaction_date) },
+        { label: "Last activity", value: formatDisplayDate(contact.last_interaction_date) },
       ],
     },
     {

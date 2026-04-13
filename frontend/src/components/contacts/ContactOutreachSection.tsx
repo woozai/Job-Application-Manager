@@ -47,10 +47,6 @@ export function ContactOutreachSection({ updateField, values }: ContactOutreachS
             {responseStatusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
           </select>
         </div>
-        <div className="form-field">
-          <label className="form-label" htmlFor="contact_last_interaction_date">Last interaction</label>
-          <input id="contact_last_interaction_date" className="form-input" type="date" value={values.last_interaction_date} onChange={(event) => updateField("last_interaction_date", event.target.value)} />
-        </div>
         <div className="form-field job-form__field--full">
           <label className="form-label" htmlFor="contact_notes">Notes</label>
           <textarea id="contact_notes" className="form-input form-textarea" value={values.notes} onChange={(event) => updateField("notes", event.target.value)} placeholder="Referral context, follow-up reminders, or conversation notes" />

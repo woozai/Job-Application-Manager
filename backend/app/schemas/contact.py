@@ -42,9 +42,6 @@ class ContactBase(BaseSchema):
     response_status: Optional[str] = Field(
         None, max_length=100, description="Status of the response"
     )
-    last_interaction_date: Optional[date] = Field(
-        None, description="Date of last interaction"
-    )
     notes: Optional[str] = Field(None, description="Additional notes about the contact")
 
     @field_validator("profile_link", mode="before")
@@ -92,9 +89,6 @@ class ContactUpdate(BaseSchema):
     response_status: Optional[str] = Field(
         None, max_length=100, description="Status of the response"
     )
-    last_interaction_date: Optional[date] = Field(
-        None, description="Date of last interaction"
-    )
     notes: Optional[str] = Field(None, description="Additional notes about the contact")
     job_application_id: Optional[int] = Field(
         None, description="ID of the associated job application"
@@ -110,6 +104,9 @@ class ContactResponse(ContactBase):
     id: int = Field(..., description="Unique identifier for the contact")
     job_application_id: int = Field(
         ..., description="ID of the associated job application"
+    )
+    last_interaction_date: Optional[date] = Field(
+        None, description="Automatically tracked date of last contact activity"
     )
     created_at: datetime = Field(
         ..., description="Timestamp when the contact was created"
