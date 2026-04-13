@@ -151,7 +151,6 @@ export function ContactsTable({
             {contacts.map((contact) => {
               const responseTone = getStatusTone(contact.response_status);
               const jobTitle = contact.job_title?.trim() ?? "";
-              const company = contact.company?.trim() ?? "";
 
               return (
                 <tr key={contact.id}>
@@ -169,7 +168,6 @@ export function ContactsTable({
                       ) : (
                         <span>{formatValue(null, "Role not set")}</span>
                       )}
-                      {company ? <span className="contacts-table__subtle">{company}</span> : null}
                     </div>
                   </td>
                   <td>
