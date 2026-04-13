@@ -1,11 +1,20 @@
-import { responseStatusOptions, type ContactFormValues } from "./contactFormShared";
+import type { ContactFormValues } from "./contactFormShared";
 
 interface ContactOutreachSectionProps {
+  isLoadingResponseStatuses: boolean;
+  responseStatusOptions: string[];
+  responseStatusOptionsError: string | null;
   updateField: <K extends keyof ContactFormValues>(field: K, value: ContactFormValues[K]) => void;
   values: ContactFormValues;
 }
 
-export function ContactOutreachSection({ updateField, values }: ContactOutreachSectionProps) {
+export function ContactOutreachSection({
+  isLoadingResponseStatuses,
+  responseStatusOptions,
+  responseStatusOptionsError,
+  updateField,
+  values,
+}: ContactOutreachSectionProps) {
   return (
     <section className="contact-form__section">
       <div className="contact-form__header">
@@ -42,10 +51,22 @@ export function ContactOutreachSection({ updateField, values }: ContactOutreachS
         </div>
         <div className="form-field">
           <label className="form-label" htmlFor="contact_response_status">Response status</label>
-          <select id="contact_response_status" className="form-input" value={values.response_status} onChange={(event) => updateField("response_status", event.target.value)}>
+          <select
+            id="contact_response_status"
+            className="form-input"
+            disabled={isLoadingResponseStatuses}
+            value={values.response_status}
+            onChange={(event) => updateField("response_status", event.target.value)}
+          >
             <option value="">Not set</option>
             {responseStatusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
           </select>
+          {isLoadingResponseStatuses ? (
+            <p className="form-hint">Loading response statuses...</p>
+          ) : null}
+          {responseStatusOptionsError ? (
+            <p className="form-error">{responseStatusOptionsError}</p>
+          ) : null}
         </div>
         <div className="form-field job-form__field--full">
           <label className="form-label" htmlFor="contact_notes">Notes</label>

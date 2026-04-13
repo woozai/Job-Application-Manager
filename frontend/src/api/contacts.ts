@@ -3,6 +3,10 @@ import { apiRequest, createListQueryParams } from "./client";
 import type { ApiMessageResponse, ListQueryParams } from "../types/api";
 import type { ContactCreateInput, ContactResponse, ContactUpdateInput } from "../types/contact";
 
+export function getContactResponseStatuses() {
+  return apiRequest<string[]>("/contacts/response-statuses");
+}
+
 export function createContact(contact: ContactCreateInput, token: string) {
   return apiRequest<ContactResponse>("/contacts/", {
     method: "POST",

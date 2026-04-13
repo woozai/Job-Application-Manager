@@ -22,7 +22,6 @@ export interface ContactFormErrors {
 
 export const relationshipOptions = ["recruiter", "employee", "manager", "friend", "referral source", "other"];
 export const priorityOptions = ["low", "medium", "high"];
-export const responseStatusOptions = ["awaiting response", "replied", "no response", "declined", "referral offered"];
 
 function normalizeDateValue(value: string | null | undefined) {
   return value ?? "";

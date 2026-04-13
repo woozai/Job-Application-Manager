@@ -8,6 +8,33 @@ from pydantic import Field, field_validator
 from app.schemas.base import BaseSchema
 from app.schemas.validators import validate_optional_http_url
 
+CONTACT_RESPONSE_STATUSES = (
+    "awaiting response",
+    "replied",
+    "resume forwarded",
+    "no response",
+    "declined",
+    "referral offered",
+)
+
+
+def validate_response_status(value: object) -> str | None:
+    if value is None:
+        return None
+
+    if not isinstance(value, str):
+        raise ValueError("Response status must be text")
+
+    normalized_value = value.strip()
+
+    if not normalized_value:
+        return None
+
+    if normalized_value not in CONTACT_RESPONSE_STATUSES:
+        raise ValueError("Response status is not supported")
+
+    return normalized_value
+
 
 class ContactBase(BaseSchema):
     name: str = Field(..., max_length=255, description="Name of the contact")
@@ -48,6 +75,11 @@ class ContactBase(BaseSchema):
     @classmethod
     def validate_profile_link(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
+
+    @field_validator("response_status", mode="before")
+    @classmethod
+    def validate_contact_response_status(cls, value: object) -> str | None:
+        return validate_response_status(value)
 
 
 class ContactCreate(ContactBase):
@@ -98,6 +130,11 @@ class ContactUpdate(BaseSchema):
     @classmethod
     def validate_profile_link(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
+
+    @field_validator("response_status", mode="before")
+    @classmethod
+    def validate_contact_response_status(cls, value: object) -> str | None:
+        return validate_response_status(value)
 
 
 class ContactResponse(ContactBase):
