@@ -58,12 +58,63 @@
 
 .contacts-table__actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .contacts-table__action-button {
-  border-color: var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  min-height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--color-ink);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.contacts-table__action-button:hover {
+  transform: translateY(-1px);
+}
+
+.contacts-table__action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+}
+
+.contacts-table__action-button--edit {
+  border-color: rgba(13, 148, 136, 0.28);
+  color: var(--color-accent-strong);
+  background: rgba(240, 253, 250, 0.9);
+}
+
+.contacts-table__action-button--edit:hover {
+  border-color: rgba(13, 148, 136, 0.42);
+  background: rgba(204, 251, 241, 0.8);
+}
+
+.contacts-table__action-button--delete {
+  border-color: rgba(185, 28, 28, 0.2);
+  color: #991b1b;
+  background: rgba(255, 248, 247, 0.95);
+}
+
+.contacts-table__action-button--delete:hover {
+  border-color: rgba(185, 28, 28, 0.34);
+  background: rgba(254, 226, 226, 0.9);
 }
 
 .contacts-table__link {
