@@ -1,4 +1,8 @@
-import type { JobApplicationCreateInput, JobApplicationResponse } from "../../types/jobApplication";
+import { jobApplicationStatuses } from "../../types/jobApplication";
+import type {
+  JobApplicationCreateInput,
+  JobApplicationResponse,
+} from "../../types/jobApplication";
 
 export interface JobApplicationFormValues {
   company_name: string;
@@ -31,19 +35,7 @@ export interface JobApplicationFormErrors {
   job_title?: string;
 }
 
-export const statusOptions = [
-  "saved",
-  "applied",
-  "waiting",
-  "connection requested",
-  "connection accepted",
-  "referral requested",
-  "interview scheduled",
-  "interview completed",
-  "rejected",
-  "offer",
-  "archived",
-];
+export const statusOptions = jobApplicationStatuses;
 
 export const workModeOptions = ["remote", "hybrid", "onsite"];
 export const applicationTypeOptions = ["direct", "through connection", "recruiter"];
@@ -104,7 +96,7 @@ export function buildPayload(values: JobApplicationFormValues): JobApplicationCr
     source_link: normalizeOptionalValue(values.source_link),
     source: normalizeOptionalValue(values.source),
     application_date: normalizeOptionalValue(values.application_date),
-    status: normalizeOptionalValue(values.status),
+    status: normalizeOptionalValue(values.status) as JobApplicationCreateInput["status"],
     short_description: normalizeOptionalValue(values.short_description),
     full_description: normalizeOptionalValue(values.full_description),
     required_skills: normalizeOptionalValue(values.required_skills),

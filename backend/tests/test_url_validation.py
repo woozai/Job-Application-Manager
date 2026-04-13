@@ -157,3 +157,34 @@ def test_script_like_user_text_is_stored_as_plain_text(client: TestClient) -> No
     assert response.status_code == 200
     assert response.json()["notes"] == script_like_text
     assert response.json()["full_description"] == f"Plain text only: {script_like_text}"
+
+
+def test_job_application_rejects_unknown_status_on_create(client: TestClient) -> None:
+    token = register_and_login(client)
+
+    response = client.post(
+        "/job-applications/",
+        headers=auth_headers(token),
+        json={
+            "company_name": "OpenAI",
+            "job_title": "Security Engineer",
+            "status": "frontend invented status",
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_job_application_rejects_unknown_status_on_update(client: TestClient) -> None:
+    token = register_and_login(client)
+    job_application = create_job_application(client, token)
+
+    response = client.put(
+        f"/job-applications/{job_application['id']}",
+        headers=auth_headers(token),
+        json={
+            "status": "frontend invented status",
+        },
+    )
+
+    assert response.status_code == 422

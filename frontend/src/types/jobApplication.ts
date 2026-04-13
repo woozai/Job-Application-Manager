@@ -1,5 +1,22 @@
 import type { ContactResponse } from "./contact";
 
+export const jobApplicationStatuses = [
+  "saved",
+  "applied",
+  "waiting",
+  "connection requested",
+  "connection accepted",
+  "referral requested",
+  "interview scheduled",
+  "interview completed",
+  "no longer open",
+  "rejected",
+  "offer",
+  "archived",
+] as const;
+
+export type JobApplicationStatus = (typeof jobApplicationStatuses)[number];
+
 export interface JobApplicationResponse {
   id: number;
   user_id: number;
@@ -9,7 +26,7 @@ export interface JobApplicationResponse {
   source_link: string | null;
   source: string | null;
   application_date: string | null;
-  status: string | null;
+  status: JobApplicationStatus | null;
   short_description: string | null;
   full_description: string | null;
   required_skills: string | null;
@@ -38,7 +55,7 @@ export interface JobApplicationCreateInput {
   source_link?: string | null;
   source?: string | null;
   application_date?: string | null;
-  status?: string | null;
+  status?: JobApplicationStatus | null;
   short_description?: string | null;
   full_description?: string | null;
   required_skills?: string | null;
@@ -64,7 +81,7 @@ export interface JobApplicationUpdateInput {
   source_link?: string | null;
   source?: string | null;
   application_date?: string | null;
-  status?: string | null;
+  status?: JobApplicationStatus | null;
   short_description?: string | null;
   full_description?: string | null;
   required_skills?: string | null;

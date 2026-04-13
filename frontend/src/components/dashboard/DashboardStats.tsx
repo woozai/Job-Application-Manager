@@ -2,7 +2,10 @@ import type { JobApplicationResponse } from "../../types/jobApplication";
 
 export function DashboardStats({ jobApplications }: { jobApplications: JobApplicationResponse[] }) {
   const activeApplications = jobApplications.filter(
-    (jobApplication) => jobApplication.status !== "rejected" && jobApplication.status !== "archived",
+    (jobApplication) =>
+      jobApplication.status !== "rejected" &&
+      jobApplication.status !== "archived" &&
+      jobApplication.status !== "no longer open",
   ).length;
   const interviewCount = jobApplications.filter((jobApplication) => (jobApplication.interview_stage ?? "").trim().length > 0).length;
   const contactsCount = jobApplications.reduce((total, jobApplication) => total + jobApplication.contacts.length, 0);

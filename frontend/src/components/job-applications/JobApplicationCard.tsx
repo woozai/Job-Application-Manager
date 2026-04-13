@@ -43,6 +43,7 @@ function getFollowUpState(jobApplication: JobApplicationResponse) {
 
 export function JobApplicationCard({ jobApplication }: JobApplicationCardProps) {
   const followUpState = getFollowUpState(jobApplication);
+  const contactsCount = jobApplication.contacts.length;
 
   return (
     <Link
@@ -82,13 +83,49 @@ export function JobApplicationCard({ jobApplication }: JobApplicationCardProps) 
         {jobApplication.interview_stage ? (
           <span className="dashboard-badge">Stage: {jobApplication.interview_stage}</span>
         ) : null}
-        {jobApplication.contacts.length > 0 ? (
-          <span className="dashboard-badge">{jobApplication.contacts.length} contacts</span>
-        ) : null}
         {followUpState ? <span className="dashboard-badge">{followUpState}</span> : null}
       </div>
 
-      <span className="dashboard-job-card__cta">Open details</span>
+      <div className="dashboard-job-card__footer">
+        <span className="dashboard-job-card__cta">Open details</span>
+        <span
+          aria-label={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
+          className="dashboard-badge dashboard-badge--contacts"
+          title={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
+        >
+          <svg
+            aria-hidden="true"
+            className="dashboard-badge__icon"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M16 19a4 4 0 0 0-8 0"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+            />
+            <path
+              d="M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path
+              d="M20 18a3 3 0 0 0-3-3"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+            />
+            <path
+              d="M17 11a2.5 2.5 0 0 0 0-5"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeWidth="2"
+            />
+          </svg>
+          <span className="dashboard-badge__count">{contactsCount}</span>
+        </span>
+      </div>
     </Link>
   );
 }

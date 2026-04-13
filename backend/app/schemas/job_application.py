@@ -1,13 +1,28 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import Field, field_validator
 
 from app.schemas.base import BaseSchema
 from app.schemas.contact import ContactResponse
 from app.schemas.validators import validate_optional_http_url
+
+JobApplicationStatus = Literal[
+    "saved",
+    "applied",
+    "waiting",
+    "connection requested",
+    "connection accepted",
+    "referral requested",
+    "interview scheduled",
+    "interview completed",
+    "no longer open",
+    "rejected",
+    "offer",
+    "archived",
+]
 
 
 class JobApplicationBase(BaseSchema):
@@ -23,8 +38,8 @@ class JobApplicationBase(BaseSchema):
     application_date: Optional[date] = Field(
         None, description="Date when the application was submitted"
     )
-    status: Optional[str] = Field(
-        "saved", max_length=100, description="Current status of the application"
+    status: JobApplicationStatus = Field(
+        "saved", description="Current status of the application"
     )
     short_description: Optional[str] = Field(
         None, description="Brief description of the job"
@@ -98,8 +113,8 @@ class JobApplicationUpdate(BaseSchema):
     application_date: Optional[date] = Field(
         None, description="Date when the application was submitted"
     )
-    status: Optional[str] = Field(
-        None, max_length=100, description="Current status of the application"
+    status: Optional[JobApplicationStatus] = Field(
+        None, description="Current status of the application"
     )
     short_description: Optional[str] = Field(
         None, description="Brief description of the job"
