@@ -4,6 +4,7 @@ import { ContactCoreSection } from "./ContactCoreSection";
 import { ContactOutreachSection } from "./ContactOutreachSection";
 import { buildPayload, createInitialValues, type ContactFormErrors, type ContactFormValues, validateForm } from "./contactFormShared";
 
+import { getContactResponseStatuses } from "../../api/contacts";
 import type { ContactCreateInput, ContactResponse, ContactUpdateInput } from "../../types/contact";
 
 interface ContactFormProps {
@@ -34,11 +35,56 @@ export function ContactForm({
   );
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
+  const [responseStatusOptions, setResponseStatusOptions] = useState<string[]>([]);
+  const [responseStatusOptionsError, setResponseStatusOptionsError] = useState<string | null>(null);
+  const [isLoadingResponseStatuses, setIsLoadingResponseStatuses] = useState(true);
+
+  const visibleResponseStatusOptions = useMemo(() => {
+    if (
+      values.response_status &&
+      !responseStatusOptions.includes(values.response_status)
+    ) {
+      return [values.response_status, ...responseStatusOptions];
+    }
+
+    return responseStatusOptions;
+  }, [responseStatusOptions, values.response_status]);
 
   useEffect(() => {
     setValues(initialValues);
     setErrors({});
   }, [initialValues]);
+
+  useEffect(() => {
+    let shouldUpdate = true;
+
+    async function loadResponseStatuses() {
+      setIsLoadingResponseStatuses(true);
+      setResponseStatusOptionsError(null);
+
+      try {
+        const loadedStatuses = await getContactResponseStatuses();
+
+        if (shouldUpdate) {
+          setResponseStatusOptions(loadedStatuses);
+        }
+      } catch {
+        if (shouldUpdate) {
+          setResponseStatusOptionsError("Could not load response statuses from the server.");
+        }
+      } finally {
+        if (shouldUpdate) {
+          setIsLoadingResponseStatuses(false);
+        }
+      }
+    }
+
+    void loadResponseStatuses();
+
+    return () => {
+      shouldUpdate = false;
+    };
+  }, []);
 
   function updateField<K extends keyof ContactFormValues>(field: K, value: ContactFormValues[K]) {
     setValues((currentValues) => ({
@@ -103,7 +149,13 @@ export function ContactForm({
 
       <form className="contact-form" noValidate onSubmit={handleSubmit}>
         <ContactCoreSection errors={errors} updateField={updateField} values={values} />
-        <ContactOutreachSection updateField={updateField} values={values} />
+        <ContactOutreachSection
+          isLoadingResponseStatuses={isLoadingResponseStatuses}
+          responseStatusOptions={visibleResponseStatusOptions}
+          responseStatusOptionsError={responseStatusOptionsError}
+          updateField={updateField}
+          values={values}
+        />
 
         {submitError ? (
           <section className="feedback-panel feedback-panel--error" role="alert">

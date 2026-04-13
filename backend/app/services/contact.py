@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy.orm import Session
 
 from app.models.contact import Contact
@@ -8,6 +10,56 @@ from app.schemas.contact import ContactCreate, ContactUpdate
 # Keep user input inside SQLAlchemy expressions and bound parameters.
 # If search/filter/sort is added here later, do not concatenate raw SQL strings.
 # For sorting, map client keys through an explicit whitelist of model columns.
+
+
+CONTACT_ACTIVITY_FIELDS = {
+    "connection_requested_at",
+    "connection_approved",
+    "connection_approved_at",
+    "message_sent",
+    "message_sent_at",
+    "response_status",
+    "notes",
+}
+
+
+def get_automatic_last_activity(
+    contact_data: dict[str, object],
+    *,
+    mark_today_when_activity_changes: bool,
+) -> date | None:
+    explicit_dates = [
+        value
+        for field in (
+            "connection_requested_at",
+            "connection_approved_at",
+            "message_sent_at",
+        )
+        if isinstance((value := contact_data.get(field)), date)
+    ]
+
+    if explicit_dates:
+        return max(explicit_dates)
+
+    has_activity_marker = bool(contact_data.get("connection_approved")) or bool(
+        contact_data.get("message_sent")
+    )
+    response_status = contact_data.get("response_status")
+    notes = contact_data.get("notes")
+
+    if isinstance(response_status, str) and response_status.strip():
+        has_activity_marker = True
+
+    if isinstance(notes, str) and notes.strip():
+        has_activity_marker = True
+
+    if has_activity_marker or (
+        mark_today_when_activity_changes
+        and CONTACT_ACTIVITY_FIELDS.intersection(contact_data)
+    ):
+        return date.today()
+
+    return None
 
 
 def get_contact(db: Session, contact_id: int) -> Contact | None:
@@ -53,7 +105,12 @@ def get_contacts_for_user(
 
 
 def create_contact(db: Session, contact: ContactCreate) -> Contact:
-    db_contact = Contact(**contact.model_dump())
+    contact_data = contact.model_dump()
+    contact_data["last_interaction_date"] = get_automatic_last_activity(
+        contact_data,
+        mark_today_when_activity_changes=False,
+    )
+    db_contact = Contact(**contact_data)
     db.add(db_contact)
     db.commit()
     db.refresh(db_contact)
@@ -69,6 +126,14 @@ def update_contact(
     update_data = contact_update.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(db_contact, field, value)
+
+    automatic_last_activity = get_automatic_last_activity(
+        update_data,
+        mark_today_when_activity_changes=True,
+    )
+    if automatic_last_activity is not None:
+        db_contact.last_interaction_date = automatic_last_activity
+
     db.commit()
     db.refresh(db_contact)
     return db_contact

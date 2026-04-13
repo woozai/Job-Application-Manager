@@ -4,7 +4,12 @@ from sqlalchemy.orm import Session
 from app.core.auth import CurrentUser
 from app.db.session import get_db
 from app.models.contact import Contact
-from app.schemas.contact import ContactCreate, ContactResponse, ContactUpdate
+from app.schemas.contact import (
+    CONTACT_RESPONSE_STATUSES,
+    ContactCreate,
+    ContactResponse,
+    ContactUpdate,
+)
 from app.services.contact import (
     create_contact,
     delete_contact,
@@ -16,6 +21,11 @@ from app.services.contact import (
 from app.services.job_application import get_job_application_for_user
 
 router = APIRouter(prefix="/contacts", tags=["contacts"])
+
+
+@router.get("/response-statuses", response_model=list[str])
+async def read_contact_response_statuses() -> list[str]:
+    return list(CONTACT_RESPONSE_STATUSES)
 
 
 @router.post("/", response_model=ContactResponse)

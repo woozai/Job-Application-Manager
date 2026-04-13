@@ -143,7 +143,7 @@ export function ContactsTable({
               <th>Approved</th>
               <th>Message sent</th>
               <th>Notes</th>
-              <th>Last interaction</th>
+              <th>Last activity</th>
               <th>Actions</th>
             </tr>
           </thead>

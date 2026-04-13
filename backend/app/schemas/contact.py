@@ -8,6 +8,33 @@ from pydantic import Field, field_validator
 from app.schemas.base import BaseSchema
 from app.schemas.validators import validate_optional_http_url
 
+CONTACT_RESPONSE_STATUSES = (
+    "awaiting response",
+    "replied",
+    "resume forwarded",
+    "no response",
+    "declined",
+    "referral offered",
+)
+
+
+def validate_response_status(value: object) -> str | None:
+    if value is None:
+        return None
+
+    if not isinstance(value, str):
+        raise ValueError("Response status must be text")
+
+    normalized_value = value.strip()
+
+    if not normalized_value:
+        return None
+
+    if normalized_value not in CONTACT_RESPONSE_STATUSES:
+        raise ValueError("Response status is not supported")
+
+    return normalized_value
+
 
 class ContactBase(BaseSchema):
     name: str = Field(..., max_length=255, description="Name of the contact")
@@ -42,15 +69,17 @@ class ContactBase(BaseSchema):
     response_status: Optional[str] = Field(
         None, max_length=100, description="Status of the response"
     )
-    last_interaction_date: Optional[date] = Field(
-        None, description="Date of last interaction"
-    )
     notes: Optional[str] = Field(None, description="Additional notes about the contact")
 
     @field_validator("profile_link", mode="before")
     @classmethod
     def validate_profile_link(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
+
+    @field_validator("response_status", mode="before")
+    @classmethod
+    def validate_contact_response_status(cls, value: object) -> str | None:
+        return validate_response_status(value)
 
 
 class ContactCreate(ContactBase):
@@ -92,9 +121,6 @@ class ContactUpdate(BaseSchema):
     response_status: Optional[str] = Field(
         None, max_length=100, description="Status of the response"
     )
-    last_interaction_date: Optional[date] = Field(
-        None, description="Date of last interaction"
-    )
     notes: Optional[str] = Field(None, description="Additional notes about the contact")
     job_application_id: Optional[int] = Field(
         None, description="ID of the associated job application"
@@ -105,11 +131,19 @@ class ContactUpdate(BaseSchema):
     def validate_profile_link(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
 
+    @field_validator("response_status", mode="before")
+    @classmethod
+    def validate_contact_response_status(cls, value: object) -> str | None:
+        return validate_response_status(value)
+
 
 class ContactResponse(ContactBase):
     id: int = Field(..., description="Unique identifier for the contact")
     job_application_id: int = Field(
         ..., description="ID of the associated job application"
+    )
+    last_interaction_date: Optional[date] = Field(
+        None, description="Automatically tracked date of last contact activity"
     )
     created_at: datetime = Field(
         ..., description="Timestamp when the contact was created"

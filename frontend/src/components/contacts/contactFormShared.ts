@@ -13,7 +13,6 @@ export interface ContactFormValues {
   message_sent: string;
   message_sent_at: string;
   response_status: string;
-  last_interaction_date: string;
   notes: string;
 }
 
@@ -23,7 +22,6 @@ export interface ContactFormErrors {
 
 export const relationshipOptions = ["recruiter", "employee", "manager", "friend", "referral source", "other"];
 export const priorityOptions = ["low", "medium", "high"];
-export const responseStatusOptions = ["awaiting response", "replied", "no response", "declined", "referral offered"];
 
 function normalizeDateValue(value: string | null | undefined) {
   return value ?? "";
@@ -46,7 +44,6 @@ export function createInitialValues(
     message_sent: contact?.message_sent ? "true" : "false",
     message_sent_at: normalizeDateValue(contact?.message_sent_at),
     response_status: contact?.response_status ?? "",
-    last_interaction_date: normalizeDateValue(contact?.last_interaction_date),
     notes: contact?.notes ?? "",
   };
 }
@@ -81,7 +78,6 @@ export function buildPayload(values: ContactFormValues, jobApplicationId: number
     message_sent: values.message_sent === "true",
     message_sent_at: normalizeOptionalValue(values.message_sent_at),
     response_status: normalizeOptionalValue(values.response_status),
-    last_interaction_date: normalizeOptionalValue(values.last_interaction_date),
     notes: normalizeOptionalValue(values.notes),
   };
 }

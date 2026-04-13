@@ -33,7 +33,6 @@ export interface ContactCreateInput {
   message_sent?: boolean;
   message_sent_at?: string | null;
   response_status?: string | null;
-  last_interaction_date?: string | null;
   notes?: string | null;
 }
 
@@ -51,6 +50,5 @@ export interface ContactUpdateInput {
   message_sent?: boolean | null;
   message_sent_at?: string | null;
   response_status?: string | null;
-  last_interaction_date?: string | null;
   notes?: string | null;
 }
