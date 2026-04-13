@@ -8,6 +8,7 @@ import type { ContactCreateInput, ContactResponse, ContactUpdateInput } from "..
 
 interface ContactFormProps {
   contact?: ContactResponse | null;
+  defaultCompanyName?: string;
   isSubmitting: boolean;
   jobApplicationId: number;
   submitError: string | null;
@@ -18,6 +19,7 @@ interface ContactFormProps {
 
 export function ContactForm({
   contact,
+  defaultCompanyName = "",
   isSubmitting,
   jobApplicationId,
   submitError,
@@ -26,7 +28,10 @@ export function ContactForm({
   onCancel,
 }: ContactFormProps) {
   const isEditing = Boolean(contact);
-  const initialValues = useMemo(() => createInitialValues(contact), [contact]);
+  const initialValues = useMemo(
+    () => createInitialValues(contact, defaultCompanyName),
+    [contact, defaultCompanyName],
+  );
   const [values, setValues] = useState<ContactFormValues>(initialValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
 

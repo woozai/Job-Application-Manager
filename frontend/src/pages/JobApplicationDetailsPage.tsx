@@ -141,6 +141,7 @@ export function JobApplicationDetailsPage() {
         />
       ) : showCreateContactForm ? (
         <ContactForm
+          defaultCompanyName={currentJobApplication.company_name}
           isSubmitting={isCreatingContact}
           jobApplicationId={currentJobApplication.id}
           onCancel={() => {

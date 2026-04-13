@@ -151,7 +151,6 @@ export function ContactsTable({
             {contacts.map((contact) => {
               const responseTone = getStatusTone(contact.response_status);
               const jobTitle = contact.job_title?.trim() ?? "";
-              const company = contact.company?.trim() ?? "";
 
               return (
                 <tr key={contact.id}>
@@ -169,7 +168,6 @@ export function ContactsTable({
                       ) : (
                         <span>{formatValue(null, "Role not set")}</span>
                       )}
-                      {company ? <span className="contacts-table__subtle">{company}</span> : null}
                     </div>
                   </td>
                   <td>
@@ -221,16 +219,24 @@ export function ContactsTable({
                   </td>
                   <td>
                     <div className="contacts-table__actions">
-                      <button className="button-link contacts-table__action-button" onClick={() => onEdit(contact)} type="button">
-                        Edit
-                      </button>
                       <button
-                        className="button-link button-link--danger contacts-table__action-button"
-                        disabled={deletingContactId === contact.id}
-                        onClick={() => onDelete(contact)}
+                        aria-label={`Edit ${contact.name}`}
+                        className="contacts-table__action-button contacts-table__action-button--edit"
+                        onClick={() => onEdit(contact)}
+                        title="Edit contact"
                         type="button"
                       >
-                        {deletingContactId === contact.id ? "Deleting..." : "Delete"}
+                        <span aria-hidden="true">✎</span>
+                      </button>
+                      <button
+                        aria-label={`Delete ${contact.name}`}
+                        className="contacts-table__action-button contacts-table__action-button--delete"
+                        disabled={deletingContactId === contact.id}
+                        onClick={() => onDelete(contact)}
+                        title="Delete contact"
+                        type="button"
+                      >
+                        <span aria-hidden="true">{deletingContactId === contact.id ? "…" : "🗑"}</span>
                       </button>
                     </div>
                   </td>

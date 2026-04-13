@@ -29,11 +29,14 @@ function normalizeDateValue(value: string | null | undefined) {
   return value ?? "";
 }
 
-export function createInitialValues(contact?: ContactResponse | null): ContactFormValues {
+export function createInitialValues(
+  contact?: ContactResponse | null,
+  defaultCompanyName = "",
+): ContactFormValues {
   return {
     name: contact?.name ?? "",
     profile_link: contact?.profile_link ?? "",
-    company: contact?.company ?? "",
+    company: contact?.company ?? defaultCompanyName,
     job_title: contact?.job_title ?? "",
     relationship_type: contact?.relationship_type ?? "",
     priority: contact?.priority ?? "medium",
