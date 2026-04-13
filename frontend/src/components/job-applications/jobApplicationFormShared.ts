@@ -40,6 +40,7 @@ export const statusOptions = [
   "referral requested",
   "interview scheduled",
   "interview completed",
+  "no longer open",
   "rejected",
   "offer",
   "archived",
