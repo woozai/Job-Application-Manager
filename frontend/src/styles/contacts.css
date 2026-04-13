@@ -107,9 +107,21 @@
   gap: 0.2rem;
 }
 
+.contacts-table__identity {
+  max-width: 15rem;
+}
+
 .contacts-table__identity strong,
 .contacts-empty-state__panel strong {
   font-size: 0.98rem;
+}
+
+.contacts-table__job-title {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .contacts-table__identity span,

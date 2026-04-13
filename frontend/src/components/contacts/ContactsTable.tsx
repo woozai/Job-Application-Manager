@@ -150,6 +150,8 @@ export function ContactsTable({
           <tbody>
             {contacts.map((contact) => {
               const responseTone = getStatusTone(contact.response_status);
+              const jobTitle = contact.job_title?.trim() ?? "";
+              const company = contact.company?.trim() ?? "";
 
               return (
                 <tr key={contact.id}>
@@ -160,12 +162,14 @@ export function ContactsTable({
                           {contact.name}
                         </Link>
                       </strong>
-                      <span>
-                        {formatValue(
-                          [contact.job_title, contact.company].filter(Boolean).join(" at "),
-                          "Role not set",
-                        )}
-                      </span>
+                      {jobTitle ? (
+                        <span className="contacts-table__job-title" title={jobTitle}>
+                          {jobTitle}
+                        </span>
+                      ) : (
+                        <span>{formatValue(null, "Role not set")}</span>
+                      )}
+                      {company ? <span className="contacts-table__subtle">{company}</span> : null}
                     </div>
                   </td>
                   <td>
