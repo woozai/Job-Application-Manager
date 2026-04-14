@@ -149,17 +149,7 @@
 }
 
 .dashboard-job-card__status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  background: var(--color-accent-soft);
-  color: var(--color-accent-strong);
-  font-size: 0.9rem;
-  font-weight: 700;
-  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .dashboard-job-card__meta {

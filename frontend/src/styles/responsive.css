@@ -171,7 +171,7 @@
 
   .dashboard-badge,
   .dashboard-job-card__status,
-  .contacts-status {
+  .status-badge {
     max-width: 100%;
     white-space: normal;
     text-align: center;
