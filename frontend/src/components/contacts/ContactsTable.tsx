@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 import type { ContactResponse } from "../../types/contact";
+import { getContactResponseStatusTone } from "../../utils/contactResponseStatusTone";
+import { StatusBadge } from "../ui/StatusBadge";
 
 function formatValue(value: string | null | undefined, fallback = "Not set") {
   if (!value || value.trim().length === 0) {
@@ -62,29 +64,6 @@ function EmptyValueIcon({ label }: { label: string }) {
       −
     </span>
   );
-}
-
-function getStatusTone(responseStatus: string | null) {
-  const normalizedStatus = responseStatus?.trim().toLowerCase();
-
-  if (!normalizedStatus) {
-    return "muted";
-  }
-
-  if (
-    normalizedStatus.includes("reply") ||
-    normalizedStatus.includes("respond") ||
-    normalizedStatus.includes("approved") ||
-    normalizedStatus.includes("accepted")
-  ) {
-    return "positive";
-  }
-
-  if (normalizedStatus.includes("declin") || normalizedStatus.includes("reject")) {
-    return "negative";
-  }
-
-  return "muted";
 }
 
 interface ContactsTableProps {
@@ -149,7 +128,6 @@ export function ContactsTable({
           </thead>
           <tbody>
             {contacts.map((contact) => {
-              const responseTone = getStatusTone(contact.response_status);
               const jobTitle = contact.job_title?.trim() ?? "";
 
               return (
@@ -180,9 +158,10 @@ export function ContactsTable({
                   </td>
                   <td>
                     <div className="contacts-table__stack">
-                      <span className={`contacts-status contacts-status--${responseTone}`}>
-                        {formatValue(contact.response_status)}
-                      </span>
+                      <StatusBadge
+                        label={contact.response_status}
+                        tone={getContactResponseStatusTone(contact.response_status)}
+                      />
                     </div>
                   </td>
                   <td>

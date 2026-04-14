@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 
 import type { ContactResponse } from "../../types/contact";
+import { getContactResponseStatusTone } from "../../utils/contactResponseStatusTone";
 import { formatDisplayDate, formatDisplayValue } from "../../utils/display";
 import { ExpandableText } from "../ui/ExpandableText";
 import { ExternalLink } from "../ui/ExternalLink";
+import { StatusBadge } from "../ui/StatusBadge";
 
 interface ContactDetailSection {
   title: string;
@@ -44,7 +46,15 @@ function createContactDetailSections(contact: ContactResponse): ContactDetailSec
         { label: "Approval date", value: formatDisplayDate(contact.connection_approved_at) },
         { label: "Message sent", value: formatBoolean(contact.message_sent, "Message sent", "Not sent") },
         { label: "Message date", value: formatDisplayDate(contact.message_sent_at) },
-        { label: "Response status", value: formatDisplayValue(contact.response_status) },
+        {
+          label: "Response status",
+          value: (
+            <StatusBadge
+              label={contact.response_status}
+              tone={getContactResponseStatusTone(contact.response_status)}
+            />
+          ),
+        },
         { label: "Last activity", value: formatDisplayDate(contact.last_interaction_date) },
       ],
     },

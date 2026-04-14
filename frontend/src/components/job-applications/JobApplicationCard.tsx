@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 import type { JobApplicationResponse } from "../../types/jobApplication";
+import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
+import { StatusBadge } from "../ui/StatusBadge";
 
 interface JobApplicationCardProps {
   jobApplication: JobApplicationResponse;
@@ -56,7 +58,11 @@ export function JobApplicationCard({ jobApplication }: JobApplicationCardProps) 
           <p className="dashboard-job-card__company">{jobApplication.company_name}</p>
           <h3>{jobApplication.job_title}</h3>
         </div>
-        <span className="dashboard-job-card__status">{jobApplication.status ?? "saved"}</span>
+        <StatusBadge
+          className="dashboard-job-card__status"
+          label={jobApplication.status}
+          tone={getJobApplicationStatusTone(jobApplication.status)}
+        />
       </div>
 
       <p className="dashboard-job-card__description">
