@@ -170,6 +170,18 @@ npm run preview
 5. Create job applications from the dashboard.
 6. Open a job details page to add, edit, or delete contacts.
 
+## Local Database Backup
+
+The local SQLite database lives at `backend/job_applications.db`.
+
+Create a timestamped backup before risky local work:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/backup-db.ps1
+```
+
+Backups are written to `backend/backups/` and are ignored by git.
+
 ## API Overview
 
 Main backend route groups:
