@@ -3,7 +3,9 @@ import type { ReactNode } from "react";
 import { ExpandableText } from "../ui/ExpandableText";
 import type { JobApplicationResponse } from "../../types/jobApplication";
 import { formatDisplayDate, formatDisplayValue } from "../../utils/display";
+import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
 import { ExternalLink } from "../ui/ExternalLink";
+import { StatusBadge } from "../ui/StatusBadge";
 
 interface DetailSection {
   title: string;
@@ -20,7 +22,15 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
       items: [
         { label: "Company", value: jobApplication.company_name },
         { label: "Job title", value: jobApplication.job_title },
-        { label: "Status", value: formatDisplayValue(jobApplication.status) },
+        {
+          label: "Status",
+          value: (
+            <StatusBadge
+              label={jobApplication.status}
+              tone={getJobApplicationStatusTone(jobApplication.status)}
+            />
+          ),
+        },
         { label: "Application date", value: formatDisplayDate(jobApplication.application_date) },
         {
           label: "Job link",
