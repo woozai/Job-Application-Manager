@@ -20,6 +20,7 @@ frontend/vite.config.d.ts
 backend/.venv/
 backend/job_applications.db
 backend/*.db
+backend/backups/
 backend/.pytest_cache/
 backend/.mypy_cache/
 backend/.ruff_cache/
