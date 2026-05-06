@@ -47,6 +47,15 @@
   align-items: center;
 }
 
+.job-form__warnings {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(180, 132, 38, 0.25);
+  border-radius: 16px;
+  background: rgba(255, 247, 219, 0.75);
+}
+
 .auth-form {
   display: grid;
   gap: 1rem;

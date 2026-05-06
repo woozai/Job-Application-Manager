@@ -1,10 +1,13 @@
 import { jobApplicationWorkflowStatuses } from "../../types/jobApplication";
 import type {
   JobApplicationCreateInput,
+  JobExtractionData,
   JobApplicationResponse,
 } from "../../types/jobApplication";
 
 export interface JobApplicationFormValues {
+  extraction_link: string;
+  extraction_raw_text: string;
   company_name: string;
   job_title: string;
   job_link: string;
@@ -31,6 +34,7 @@ export interface JobApplicationFormValues {
 }
 
 export interface JobApplicationFormErrors {
+  extraction_link?: string;
   company_name?: string;
   job_title?: string;
 }
@@ -43,6 +47,8 @@ export const priorityOptions = ["low", "medium", "high"];
 
 export function createInitialValues(initialData?: JobApplicationResponse): JobApplicationFormValues {
   return {
+    extraction_link: initialData?.job_link ?? initialData?.source_link ?? "",
+    extraction_raw_text: "",
     company_name: initialData?.company_name ?? "",
     job_title: initialData?.job_title ?? "",
     job_link: initialData?.job_link ?? "",
@@ -83,7 +89,7 @@ export function validateForm(values: JobApplicationFormValues) {
   return errors;
 }
 
-function normalizeOptionalValue(value: string) {
+export function normalizeOptionalValue(value: string) {
   const trimmedValue = value.trim();
   return trimmedValue.length > 0 ? trimmedValue : null;
 }
@@ -114,4 +120,44 @@ export function buildPayload(values: JobApplicationFormValues): JobApplicationCr
     rejection_reason: normalizeOptionalValue(values.rejection_reason),
     tags: normalizeOptionalValue(values.tags),
   };
+}
+
+const extractionFieldMap = [
+  "company_name",
+  "job_title",
+  "location",
+  "full_description",
+  "required_skills",
+  "short_description",
+  "source",
+  "source_link",
+  "job_link",
+  "work_mode",
+  "salary_range",
+] as const;
+
+type ExtractionFieldName = (typeof extractionFieldMap)[number];
+
+export function mergeExtractedValues(
+  currentValues: JobApplicationFormValues,
+  extracted: JobExtractionData,
+) {
+  const nextValues: JobApplicationFormValues = { ...currentValues };
+
+  extractionFieldMap.forEach((fieldName: ExtractionFieldName) => {
+    const currentValue = currentValues[fieldName];
+    const extractedValue = extracted[fieldName];
+
+    if (currentValue.trim().length > 0) {
+      return;
+    }
+
+    nextValues[fieldName] = extractedValue ?? "";
+  });
+
+  if (nextValues.job_link.trim().length === 0 && currentValues.extraction_link.trim().length > 0) {
+    nextValues.job_link = currentValues.extraction_link.trim();
+  }
+
+  return nextValues;
 }

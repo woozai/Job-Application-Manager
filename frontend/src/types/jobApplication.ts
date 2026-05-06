@@ -108,3 +108,27 @@ export interface JobApplicationUpdateInput {
   archived_at?: string | null;
   archive_reason?: string | null;
 }
+
+export interface JobExtractionInput {
+  url: string;
+  raw_text?: string | null;
+}
+
+export interface JobExtractionData {
+  company_name: string | null;
+  job_title: string | null;
+  location: string | null;
+  full_description: string | null;
+  required_skills: string | null;
+  short_description: string | null;
+  source: string | null;
+  source_link: string | null;
+  job_link: string | null;
+  work_mode: string | null;
+  salary_range: string | null;
+}
+
+export interface JobExtractionResponse {
+  data: JobExtractionData;
+  warnings: string[];
+}

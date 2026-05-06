@@ -3,6 +3,8 @@ import { apiRequest, createListQueryParams } from "./client";
 import type { ApiMessageResponse, ListQueryParams } from "../types/api";
 import type {
   JobApplicationCreateInput,
+  JobExtractionInput,
+  JobExtractionResponse,
   JobApplicationResponse,
   JobApplicationUpdateInput,
 } from "../types/jobApplication";
@@ -79,6 +81,14 @@ export function restoreJobApplication(jobApplicationId: number, token: string) {
 export function deleteJobApplication(jobApplicationId: number, token: string) {
   return apiRequest<ApiMessageResponse>(`/job-applications/${jobApplicationId}`, {
     method: "DELETE",
+    token,
+  });
+}
+
+export function extractJobFromLink(payload: JobExtractionInput, token: string) {
+  return apiRequest<JobExtractionResponse>("/jobs/from-link", {
+    method: "POST",
+    body: payload,
     token,
   });
 }

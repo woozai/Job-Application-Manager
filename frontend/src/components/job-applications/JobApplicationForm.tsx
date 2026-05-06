@@ -1,12 +1,25 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { useAuth } from "../../hooks/useAuth";
+import { useJobExtraction } from "../../hooks/useJobExtraction";
+import type {
+  JobApplicationCreateInput,
+  JobApplicationResponse,
+} from "../../types/jobApplication";
+import { JobApplicationExtractionSection } from "./JobApplicationExtractionSection";
 import { JobApplicationCoreSection } from "./JobApplicationCoreSection";
 import { JobApplicationDescriptionSection } from "./JobApplicationDescriptionSection";
 import { JobApplicationProcessSection } from "./JobApplicationProcessSection";
-import { buildPayload, createInitialValues, type JobApplicationFormErrors, type JobApplicationFormValues, validateForm } from "./jobApplicationFormShared";
-
-import type { JobApplicationCreateInput, JobApplicationResponse } from "../../types/jobApplication";
+import {
+  buildPayload,
+  createInitialValues,
+  mergeExtractedValues,
+  normalizeOptionalValue,
+  type JobApplicationFormErrors,
+  type JobApplicationFormValues,
+  validateForm,
+} from "./jobApplicationFormShared";
 
 interface JobApplicationFormProps {
   initialData?: JobApplicationResponse;
@@ -29,8 +42,16 @@ export function JobApplicationForm({
   description,
   onSubmit,
 }: JobApplicationFormProps) {
+  const { token } = useAuth();
   const [values, setValues] = useState<JobApplicationFormValues>(() => createInitialValues(initialData));
   const [errors, setErrors] = useState<JobApplicationFormErrors>({});
+  const {
+    extractError,
+    extractJobDetails,
+    extractWarnings,
+    isExtracting,
+    resetExtractionFeedback,
+  } = useJobExtraction({ token });
 
   const initialValues = useMemo(() => createInitialValues(initialData), [initialData]);
 
@@ -58,6 +79,30 @@ export function JobApplicationForm({
   function resetForm() {
     setValues(initialValues);
     setErrors({});
+    resetExtractionFeedback();
+  }
+
+  async function handleExtract() {
+    if (isExtracting) {
+      return;
+    }
+
+    const normalizedLink = normalizeOptionalValue(values.extraction_link);
+    if (!normalizedLink) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        extraction_link: "Add a job link before trying to extract details.",
+      }));
+      return;
+    }
+
+    const response = await extractJobDetails({
+      rawText: normalizeOptionalValue(values.extraction_raw_text),
+      url: normalizedLink,
+    });
+    if (response) {
+      setValues((currentValues) => mergeExtractedValues(currentValues, response.data));
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -84,6 +129,15 @@ export function JobApplicationForm({
       <p className="page-card__body">{description}</p>
 
       <form className="job-form" noValidate onSubmit={handleSubmit}>
+        <JobApplicationExtractionSection
+          errors={errors}
+          extractError={extractError}
+          extractWarnings={extractWarnings}
+          isExtracting={isExtracting}
+          onExtract={() => void handleExtract()}
+          updateField={updateField}
+          values={values}
+        />
         <JobApplicationCoreSection errors={errors} updateField={updateField} values={values} />
         <JobApplicationDescriptionSection updateField={updateField} values={values} />
         <JobApplicationProcessSection updateField={updateField} values={values} />
