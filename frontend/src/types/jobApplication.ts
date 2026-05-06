@@ -43,6 +43,9 @@ export interface JobApplicationResponse {
   interview_stage: string | null;
   rejection_reason: string | null;
   tags: string | null;
+  is_archived: boolean;
+  archived_at: string | null;
+  archive_reason: string | null;
   contacts: ContactResponse[];
   created_at: string;
   updated_at: string;
@@ -98,4 +101,7 @@ export interface JobApplicationUpdateInput {
   interview_stage?: string | null;
   rejection_reason?: string | null;
   tags?: string | null;
+  is_archived?: boolean;
+  archived_at?: string | null;
+  archive_reason?: string | null;
 }
