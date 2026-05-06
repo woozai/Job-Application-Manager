@@ -6,6 +6,11 @@ from app.schemas.job_application import (
     JobApplicationResponse,
     JobApplicationUpdate,
 )
+from app.schemas.job_extraction import (
+    JobExtractionData,
+    JobFromLinkRequest,
+    JobFromLinkResponse,
+)
 from app.schemas.user import Token, UserCreate, UserResponse, UserUpdate
 
 
@@ -16,6 +21,9 @@ __all__ = [
     "JobApplicationCreate",
     "JobApplicationResponse",
     "JobApplicationUpdate",
+    "JobExtractionData",
+    "JobFromLinkRequest",
+    "JobFromLinkResponse",
     "Token",
     "UserCreate",
     "UserResponse",

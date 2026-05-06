@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 
 from app.core.config import settings
-from app.routers import contact, health, job_application, user
+from app.routers import contact, health, job_application, job_extraction, user
 
 
 def create_app() -> FastAPI:
@@ -32,6 +32,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(user.router)
     app.include_router(job_application.router)
+    app.include_router(job_extraction.router)
     app.include_router(contact.router)
     return app
 

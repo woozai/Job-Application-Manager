@@ -30,6 +30,40 @@
   gap: 1rem;
 }
 
+.job-form__mode-switch {
+  display: inline-flex;
+  gap: 0.5rem;
+  padding: 0.3rem;
+  width: fit-content;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.job-form__mode-button {
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.job-form__mode-button:hover {
+  color: var(--color-ink);
+}
+
+.job-form__mode-button--active {
+  background: rgba(13, 148, 136, 0.14);
+  color: var(--color-accent-strong);
+}
+
 .job-form__field--full {
   grid-column: 1 / -1;
 }
@@ -45,6 +79,22 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
+}
+
+.job-form__warnings {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(180, 132, 38, 0.25);
+  border-radius: 16px;
+  background: rgba(255, 247, 219, 0.75);
+}
+
+.job-form__warnings-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #8a5a13;
 }
 
 .auth-form {
