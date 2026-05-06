@@ -1,3 +1,4 @@
+import type { KeyboardEvent, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { JobApplicationResponse } from "../../types/jobApplication";
@@ -65,7 +66,7 @@ export function JobApplicationCard({
     void navigate(`/job-applications/${jobApplication.id}`);
   }
 
-  function handleCardKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+  function handleCardKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key !== "Enter" && event.key !== " ") {
       return;
     }
@@ -74,7 +75,7 @@ export function JobApplicationCard({
     openDetails();
   }
 
-  function handleActionClick(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleActionClick(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
 
     if (isActionLoading) {

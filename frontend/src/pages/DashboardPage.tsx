@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-import { getJobApplications } from "../api/jobApplications";
+import {
+  archiveJobApplication,
+  getJobApplications,
+  restoreJobApplication,
+} from "../api/jobApplications";
 import { ApiError } from "../api/client";
 import { DashboardFiltersPanel } from "../components/dashboard/DashboardFiltersPanel";
 import { DashboardStats } from "../components/dashboard/DashboardStats";
@@ -18,9 +22,11 @@ export function DashboardPage() {
   const { currentUser, token } = useAuth();
   const location = useLocation();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [jobApplications, setJobApplications] = useState<JobApplicationResponse[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isLoadingApplications, setIsLoadingApplications] = useState(true);
+  const [jobApplicationActionId, setJobApplicationActionId] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<DashboardViewMode>("active");
   const filters = useDashboardFilters(jobApplications, viewMode);
@@ -63,13 +69,77 @@ export function DashboardPage() {
     void loadJobApplications();
   }, [token]);
 
+  function replaceJobApplication(updatedJobApplication: JobApplicationResponse) {
+    setJobApplications((current) =>
+      current.map((jobApplication) =>
+        jobApplication.id === updatedJobApplication.id ? updatedJobApplication : jobApplication,
+      ),
+    );
+  }
+
+  async function handleArchive(jobApplication: JobApplicationResponse) {
+    if (!token || jobApplicationActionId !== null) {
+      return;
+    }
+
+    setJobApplicationActionId(jobApplication.id);
+    setActionError(null);
+    setSuccessMessage(null);
+
+    try {
+      const updatedJobApplication = await archiveJobApplication(jobApplication.id, token);
+      replaceJobApplication(updatedJobApplication);
+      setSuccessMessage(`${jobApplication.company_name} was moved to archive.`);
+    } catch (error) {
+      setActionError(
+        error instanceof ApiError
+          ? error.message
+          : "We could not archive this job application. Please try again.",
+      );
+    } finally {
+      setJobApplicationActionId(null);
+    }
+  }
+
+  async function handleRestore(jobApplication: JobApplicationResponse) {
+    if (!token || jobApplicationActionId !== null) {
+      return;
+    }
+
+    setJobApplicationActionId(jobApplication.id);
+    setActionError(null);
+    setSuccessMessage(null);
+
+    try {
+      const updatedJobApplication = await restoreJobApplication(jobApplication.id, token);
+      replaceJobApplication(updatedJobApplication);
+      setSuccessMessage(`${jobApplication.company_name} was restored to your active dashboard.`);
+    } catch (error) {
+      setActionError(
+        error instanceof ApiError
+          ? error.message
+          : "We could not restore this job application. Please try again.",
+      );
+    } finally {
+      setJobApplicationActionId(null);
+    }
+  }
+
   return (
     <div className="page-stack">
       {successMessage ? (
         <section className="feedback-panel feedback-panel--success" role="status">
           <p className="feedback-panel__eyebrow">Success</p>
-          <h3>Welcome back</h3>
+          <h3>Dashboard updated</h3>
           <p>{successMessage}</p>
+        </section>
+      ) : null}
+
+      {actionError ? (
+        <section className="feedback-panel feedback-panel--error" role="alert">
+          <p className="feedback-panel__eyebrow">Could not update archive</p>
+          <h3>Archive action failed</h3>
+          <p>{actionError}</p>
         </section>
       ) : null}
 
@@ -188,7 +258,14 @@ export function DashboardPage() {
 
           <div className="dashboard-grid">
             {filters.filteredJobApplications.map((jobApplication) => (
-              <JobApplicationCard key={jobApplication.id} jobApplication={jobApplication} />
+              <JobApplicationCard
+                key={jobApplication.id}
+                isActionLoading={jobApplicationActionId === jobApplication.id}
+                jobApplication={jobApplication}
+                onArchive={(currentJobApplication) => void handleArchive(currentJobApplication)}
+                onRestore={(currentJobApplication) => void handleRestore(currentJobApplication)}
+                viewMode={viewMode}
+              />
             ))}
           </div>
         </section>
