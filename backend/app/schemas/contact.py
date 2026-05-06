@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import Field, field_validator
 
 from app.schemas.base import BaseSchema
-from app.schemas.validators import validate_optional_http_url
+from app.schemas.validators import validate_optional_http_url, validate_optional_text, validate_required_text
 
 CONTACT_RESPONSE_STATUSES = (
     "awaiting response",
@@ -76,6 +76,23 @@ class ContactBase(BaseSchema):
     def validate_profile_link(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
 
+    @field_validator("name", mode="before")
+    @classmethod
+    def validate_name(cls, value: object) -> str:
+        return validate_required_text(value, field_name="Name")
+
+    @field_validator(
+        "company",
+        "job_title",
+        "relationship_type",
+        "priority",
+        "notes",
+        mode="before",
+    )
+    @classmethod
+    def normalize_optional_text_fields(cls, value: object, info) -> str | None:
+        return validate_optional_text(value, field_name=info.field_name.replace("_", " ").title())
+
     @field_validator("response_status", mode="before")
     @classmethod
     def validate_contact_response_status(cls, value: object) -> str | None:
@@ -130,6 +147,19 @@ class ContactUpdate(BaseSchema):
     @classmethod
     def validate_profile_link(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
+
+    @field_validator(
+        "name",
+        "company",
+        "job_title",
+        "relationship_type",
+        "priority",
+        "notes",
+        mode="before",
+    )
+    @classmethod
+    def normalize_optional_text_fields(cls, value: object, info) -> str | None:
+        return validate_optional_text(value, field_name=info.field_name.replace("_", " ").title())
 
     @field_validator("response_status", mode="before")
     @classmethod
