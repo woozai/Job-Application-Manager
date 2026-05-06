@@ -134,6 +134,7 @@
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-lg);
+  cursor: pointer;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -245,12 +246,24 @@
   gap: 1rem;
 }
 
+.dashboard-job-card__footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .dashboard-job-card__cta {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   color: var(--color-accent-strong);
   font-weight: 700;
+}
+
+.dashboard-job-card__action-button[disabled] {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .dashboard-empty-state {

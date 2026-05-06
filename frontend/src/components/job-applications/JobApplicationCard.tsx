@@ -1,11 +1,16 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import type { JobApplicationResponse } from "../../types/jobApplication";
+import type { DashboardViewMode } from "../../hooks/useDashboardFilters";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
 import { StatusBadge } from "../ui/StatusBadge";
 
 interface JobApplicationCardProps {
   jobApplication: JobApplicationResponse;
+  isActionLoading?: boolean;
+  onArchive?: (jobApplication: JobApplicationResponse) => void;
+  onRestore?: (jobApplication: JobApplicationResponse) => void;
+  viewMode?: DashboardViewMode;
 }
 
 function formatDisplayDate(value: string | null) {
@@ -43,15 +48,55 @@ function getFollowUpState(jobApplication: JobApplicationResponse) {
   return nextActionDate <= today ? "Follow-up due" : "Upcoming action";
 }
 
-export function JobApplicationCard({ jobApplication }: JobApplicationCardProps) {
+export function JobApplicationCard({
+  jobApplication,
+  isActionLoading = false,
+  onArchive,
+  onRestore,
+  viewMode = "active",
+}: JobApplicationCardProps) {
+  const navigate = useNavigate();
   const followUpState = getFollowUpState(jobApplication);
   const contactsCount = jobApplication.contacts.length;
+  const isArchiveView = viewMode === "archived";
+  const actionLabel = isArchiveView ? "Restore" : "Archive";
+
+  function openDetails() {
+    void navigate(`/job-applications/${jobApplication.id}`);
+  }
+
+  function handleCardKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    openDetails();
+  }
+
+  function handleActionClick(event: React.MouseEvent<HTMLButtonElement>) {
+    event.stopPropagation();
+
+    if (isActionLoading) {
+      return;
+    }
+
+    if (isArchiveView) {
+      onRestore?.(jobApplication);
+      return;
+    }
+
+    onArchive?.(jobApplication);
+  }
 
   return (
-    <Link
+    <article
       aria-label={`Open details for ${jobApplication.company_name} ${jobApplication.job_title}`}
       className="dashboard-job-card"
-      to={`/job-applications/${jobApplication.id}`}
+      onClick={openDetails}
+      onKeyDown={handleCardKeyDown}
+      role="link"
+      tabIndex={0}
     >
       <div className="dashboard-job-card__header">
         <div>
@@ -93,7 +138,17 @@ export function JobApplicationCard({ jobApplication }: JobApplicationCardProps) 
       </div>
 
       <div className="dashboard-job-card__footer">
-        <span className="dashboard-job-card__cta">Open details</span>
+        <div className="dashboard-job-card__footer-actions">
+          <span className="dashboard-job-card__cta">Open details</span>
+          <button
+            className="button-link dashboard-job-card__action-button"
+            disabled={isActionLoading}
+            onClick={handleActionClick}
+            type="button"
+          >
+            {isActionLoading ? `${actionLabel}...` : actionLabel}
+          </button>
+        </div>
         <span
           aria-label={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
           className="dashboard-badge dashboard-badge--contacts"
@@ -132,6 +187,6 @@ export function JobApplicationCard({ jobApplication }: JobApplicationCardProps) 
           <span className="dashboard-badge__count">{contactsCount}</span>
         </span>
       </div>
-    </Link>
+    </article>
   );
 }
