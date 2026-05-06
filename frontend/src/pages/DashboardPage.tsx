@@ -9,11 +9,9 @@ import { JobApplicationCard } from "../components/job-applications/JobApplicatio
 import { ErrorState } from "../components/ui/ErrorState";
 import { LoadingState } from "../components/ui/LoadingState";
 import { useAuth } from "../hooks/useAuth";
-import { useDashboardFilters } from "../hooks/useDashboardFilters";
+import { useDashboardFilters, type DashboardViewMode } from "../hooks/useDashboardFilters";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import type { JobApplicationResponse } from "../types/jobApplication";
-
-type DashboardViewMode = "active" | "archived";
 
 export function DashboardPage() {
   useDocumentTitle("Dashboard | Job Application Manager");
@@ -25,7 +23,7 @@ export function DashboardPage() {
   const [isLoadingApplications, setIsLoadingApplications] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<DashboardViewMode>("active");
-  const filters = useDashboardFilters(jobApplications);
+  const filters = useDashboardFilters(jobApplications, viewMode);
   const isArchiveView = viewMode === "archived";
 
   useEffect(() => {
@@ -163,7 +161,7 @@ export function DashboardPage() {
         </section>
       ) : null}
 
-      {!isLoadingApplications && !loadError && jobApplications.length > 0 && filters.filteredJobApplications.length === 0 ? (
+      {!isLoadingApplications && !loadError && filters.scopedJobApplications.length > 0 && filters.filteredJobApplications.length === 0 ? (
         <section className="page-card dashboard-empty-state">
           <p className="page-card__eyebrow">No matching results</p>
           <h2>No applications match your current filters</h2>
@@ -184,7 +182,7 @@ export function DashboardPage() {
               <h2>{isArchiveView ? "Archived opportunities" : "Recent opportunities"}</h2>
             </div>
             <p className="dashboard-section__meta">
-              Showing {filters.filteredJobApplications.length} of {jobApplications.length}
+              Showing {filters.filteredJobApplications.length} of {filters.scopedJobApplications.length}
             </p>
           </div>
 
