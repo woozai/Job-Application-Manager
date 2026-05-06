@@ -64,11 +64,6 @@ export function JobApplicationProcessSection({ updateField, values }: JobApplica
           <label className="form-label" htmlFor="rejection_reason">Rejection reason</label>
           <input id="rejection_reason" className="form-input" value={values.rejection_reason} onChange={(event) => updateField("rejection_reason", event.target.value)} />
         </div>
-        <div className="form-field job-form__field--full">
-          <label className="form-label" htmlFor="tags">Tags</label>
-          <input id="tags" className="form-input" value={values.tags} onChange={(event) => updateField("tags", event.target.value)} placeholder="frontend, remote, referral" />
-          <p className="form-hint">Separate tags with commas.</p>
-        </div>
       </div>
     </section>
   );

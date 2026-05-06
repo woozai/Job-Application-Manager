@@ -57,7 +57,6 @@ def test_jobs_from_link_returns_prefill_data_and_warnings(
             "required_skills": None,
             "short_description": None,
             "source": None,
-            "source_link": None,
             "job_link": None,
             "work_mode": None,
             "salary_range": None,

@@ -47,10 +47,6 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
           label: "Job link",
           value: <ExternalLink fallback="Not set" url={jobApplication.job_link} />,
         },
-        {
-          label: "Source link",
-          value: <ExternalLink fallback="Not set" url={jobApplication.source_link} />,
-        },
         { label: "Source", value: formatDisplayValue(jobApplication.source) },
         { label: "Location", value: formatDisplayValue(jobApplication.location) },
         { label: "Archive reason", value: formatDisplayValue(jobApplication.archive_reason) },
@@ -63,7 +59,6 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
         { label: "Full description", value: <MarkdownText collapsedHeight={260} markdown={jobApplication.full_description} /> },
         { label: "Required skills", value: <MarkdownText collapsedHeight={180} markdown={jobApplication.required_skills} /> },
         { label: "Notes", value: <MarkdownText collapsedHeight={180} markdown={jobApplication.notes} /> },
-        { label: "Tags", value: formatDisplayValue(jobApplication.tags) },
       ],
     },
     {
