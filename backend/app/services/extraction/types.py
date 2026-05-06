@@ -68,7 +68,10 @@ class ExtractionResult(BaseSchema):
 
 
 class EntityExtractionAdapter(Protocol):
-    entity_type: EntityType
+    @property
+    def entity_type(self) -> EntityType:
+        """Return the entity type handled by this adapter."""
+        ...
 
     def schema_instructions(self) -> str:
         """Return entity-specific AI instructions."""

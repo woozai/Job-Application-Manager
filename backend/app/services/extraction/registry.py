@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from app.services.extraction.contact import ContactExtractionAdapter
+from app.services.extraction.job_application import JobApplicationExtractionAdapter
 from app.services.extraction.types import (
     EntityExtractionAdapter,
     EntityType,
@@ -26,3 +28,12 @@ class EntityExtractionRegistry:
             )
 
         return adapter
+
+
+def build_default_entity_extraction_registry() -> EntityExtractionRegistry:
+    return EntityExtractionRegistry(
+        adapters=[
+            JobApplicationExtractionAdapter(),
+            ContactExtractionAdapter(),
+        ]
+    )
