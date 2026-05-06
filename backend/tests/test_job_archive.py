@@ -107,6 +107,8 @@ def test_job_can_be_restored_without_changing_status(client: TestClient) -> None
 def test_archive_fields_are_returned_in_job_application_responses(
     client: TestClient,
 ) -> None:
+    
+    
     token = register_and_login(client)
     job_application = create_job_application(client, token, status="saved")
 
