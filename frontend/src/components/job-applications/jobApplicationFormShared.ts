@@ -6,6 +6,7 @@ import type {
 } from "../../types/jobApplication";
 
 export interface JobApplicationFormValues {
+  extraction_mode: "link" | "text";
   extraction_link: string;
   extraction_raw_text: string;
   company_name: string;
@@ -35,6 +36,7 @@ export interface JobApplicationFormValues {
 
 export interface JobApplicationFormErrors {
   extraction_link?: string;
+  extraction_raw_text?: string;
   company_name?: string;
   job_title?: string;
 }
@@ -47,6 +49,7 @@ export const priorityOptions = ["low", "medium", "high"];
 
 export function createInitialValues(initialData?: JobApplicationResponse): JobApplicationFormValues {
   return {
+    extraction_mode: "link",
     extraction_link: initialData?.job_link ?? initialData?.source_link ?? "",
     extraction_raw_text: "",
     company_name: initialData?.company_name ?? "",

@@ -88,17 +88,25 @@ export function JobApplicationForm({
     }
 
     const normalizedLink = normalizeOptionalValue(values.extraction_link);
-    if (!normalizedLink) {
+    const normalizedRawText = normalizeOptionalValue(values.extraction_raw_text);
+    if (values.extraction_mode === "link" && !normalizedLink) {
       setErrors((currentErrors) => ({
         ...currentErrors,
         extraction_link: "Add a job link before trying to extract details.",
       }));
       return;
     }
+    if (values.extraction_mode === "text" && !normalizedRawText) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        extraction_raw_text: "Paste the job description before trying to extract details.",
+      }));
+      return;
+    }
 
     const response = await extractJobDetails({
-      rawText: normalizeOptionalValue(values.extraction_raw_text),
-      url: normalizedLink,
+      rawText: values.extraction_mode === "text" ? normalizedRawText : normalizedRawText,
+      url: normalizedLink ?? "https://example.com/jobs/from-pasted-text",
     });
     if (response) {
       setValues((currentValues) => mergeExtractedValues(currentValues, response.data));
