@@ -64,11 +64,6 @@ export function JobApplicationCoreSection({ errors, updateField, values }: JobAp
         </div>
 
         <div className="form-field">
-          <label className="form-label" htmlFor="source_link">Source link</label>
-          <input id="source_link" className="form-input" type="url" value={values.source_link} onChange={(event) => updateField("source_link", event.target.value)} />
-        </div>
-
-        <div className="form-field">
           <label className="form-label" htmlFor="source">Source</label>
           <input id="source" className="form-input" value={values.source} onChange={(event) => updateField("source", event.target.value)} placeholder="LinkedIn, company site, recruiter" />
         </div>

@@ -33,9 +33,6 @@ class JobApplicationBase(BaseSchema):
     company_name: str = Field(..., max_length=255, description="Name of the company")
     job_title: str = Field(..., max_length=255, description="Title of the job position")
     job_link: Optional[str] = Field(None, description="Link to the job posting")
-    source_link: Optional[str] = Field(
-        None, description="Link to the source where the job was found"
-    )
     source: Optional[str] = Field(
         None, max_length=100, description="Source platform or website"
     )
@@ -86,11 +83,7 @@ class JobApplicationBase(BaseSchema):
     rejection_reason: Optional[str] = Field(
         None, description="Reason for rejection if applicable"
     )
-    tags: Optional[str] = Field(
-        None, description="Tags associated with the application"
-    )
-
-    @field_validator("job_link", "source_link", mode="before")
+    @field_validator("job_link", mode="before")
     @classmethod
     def validate_external_links(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
@@ -115,7 +108,6 @@ class JobApplicationBase(BaseSchema):
         "recruiter_name",
         "interview_stage",
         "rejection_reason",
-        "tags",
         mode="before",
     )
     @classmethod
@@ -135,9 +127,6 @@ class JobApplicationUpdate(BaseSchema):
         None, max_length=255, description="Title of the job position"
     )
     job_link: Optional[str] = Field(None, description="Link to the job posting")
-    source_link: Optional[str] = Field(
-        None, description="Link to the source where the job was found"
-    )
     source: Optional[str] = Field(
         None, max_length=100, description="Source platform or website"
     )
@@ -188,9 +177,6 @@ class JobApplicationUpdate(BaseSchema):
     rejection_reason: Optional[str] = Field(
         None, description="Reason for rejection if applicable"
     )
-    tags: Optional[str] = Field(
-        None, description="Tags associated with the application"
-    )
     is_archived: Optional[bool] = Field(
         None, description="Whether the job is archived from the active dashboard"
     )
@@ -201,7 +187,7 @@ class JobApplicationUpdate(BaseSchema):
         None, description="Optional reason for archiving the job"
     )
 
-    @field_validator("job_link", "source_link", mode="before")
+    @field_validator("job_link", mode="before")
     @classmethod
     def validate_external_links(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
@@ -223,7 +209,6 @@ class JobApplicationUpdate(BaseSchema):
         "recruiter_name",
         "interview_stage",
         "rejection_reason",
-        "tags",
         "archive_reason",
         mode="before",
     )

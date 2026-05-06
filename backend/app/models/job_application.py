@@ -19,7 +19,6 @@ class JobApplication(Base):
     company_name: Mapped[str] = mapped_column(String(255), nullable=False)
     job_title: Mapped[str] = mapped_column(String(255), nullable=False)
     job_link: Mapped[str | None] = mapped_column(Text)
-    source_link: Mapped[str | None] = mapped_column(Text)
     source: Mapped[str | None] = mapped_column(String(100))
     application_date: Mapped[date | None] = mapped_column(Date)
     status: Mapped[str] = mapped_column(String(100), nullable=False, default="saved", server_default="saved")
@@ -38,7 +37,6 @@ class JobApplication(Base):
     next_action_date: Mapped[date | None] = mapped_column(Date)
     interview_stage: Mapped[str | None] = mapped_column(String(100))
     rejection_reason: Mapped[str | None] = mapped_column(Text)
-    tags: Mapped[str | None] = mapped_column(Text)
     is_archived: Mapped[bool] = mapped_column(
         Boolean,
         nullable=False,

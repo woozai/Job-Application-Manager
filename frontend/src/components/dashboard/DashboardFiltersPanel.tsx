@@ -7,7 +7,6 @@ interface DashboardFiltersPanelProps {
     applicationTypes: string[];
     companies: string[];
     statuses: string[];
-    tags: string[];
   };
   hasActiveFilters: boolean;
   onClose: () => void;
@@ -19,9 +18,7 @@ interface DashboardFiltersPanelProps {
   setDateToFilter: (value: string) => void;
   setSearchTerm: (value: string) => void;
   setStatusFilter: (value: string) => void;
-  setTagFilter: (value: string) => void;
   statusFilter: string;
-  tagFilter: string;
 }
 
 export function DashboardFiltersPanel({
@@ -40,9 +37,7 @@ export function DashboardFiltersPanel({
   setDateToFilter,
   setSearchTerm,
   setStatusFilter,
-  setTagFilter,
   statusFilter,
-  tagFilter,
 }: DashboardFiltersPanelProps) {
   return (
     <section className="page-card dashboard-filters">
@@ -60,7 +55,7 @@ export function DashboardFiltersPanel({
       <div className="dashboard-filters__grid">
         <div className="form-field">
           <label className="form-label" htmlFor="dashboard-search">Keyword</label>
-          <input id="dashboard-search" className="form-input" onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search company, title, notes, or tags" type="search" value={searchTerm} />
+          <input id="dashboard-search" className="form-input" onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search company, title, or notes" type="search" value={searchTerm} />
         </div>
         <div className="form-field">
           <label className="form-label" htmlFor="dashboard-status-filter">Status</label>
@@ -74,13 +69,6 @@ export function DashboardFiltersPanel({
           <select id="dashboard-company-filter" className="form-input" onChange={(event) => setCompanyFilter(event.target.value)} value={companyFilter}>
             <option value="all">All companies</option>
             {filterOptions.companies.map((company) => <option key={company} value={company}>{company}</option>)}
-          </select>
-        </div>
-        <div className="form-field">
-          <label className="form-label" htmlFor="dashboard-tag-filter">Tag</label>
-          <select id="dashboard-tag-filter" className="form-input" onChange={(event) => setTagFilter(event.target.value)} value={tagFilter}>
-            <option value="all">All tags</option>
-            {filterOptions.tags.map((tag) => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
         <div className="form-field">
