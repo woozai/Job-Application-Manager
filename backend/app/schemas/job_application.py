@@ -83,6 +83,7 @@ class JobApplicationBase(BaseSchema):
     rejection_reason: Optional[str] = Field(
         None, description="Reason for rejection if applicable"
     )
+
     @field_validator("job_link", mode="before")
     @classmethod
     def validate_external_links(cls, value: object) -> str | None:
