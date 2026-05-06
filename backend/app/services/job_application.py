@@ -8,6 +8,8 @@ from app.schemas.job_application import JobApplicationCreate, JobApplicationUpda
 # If search/filter/sort is added here later, do not concatenate raw SQL strings.
 # For sorting, map client keys through an explicit whitelist of model columns.
 
+ARCHIVE_UPDATE_FIELDS = {"is_archived", "archived_at", "archive_reason"}
+
 
 def get_job_application(db: Session, job_application_id: int) -> JobApplication | None:
     return (
@@ -53,6 +55,22 @@ def create_job_application(
     return db_job_application
 
 
+def apply_job_application_updates(
+    db_job_application: JobApplication,
+    job_application_update: JobApplicationUpdate,
+) -> None:
+    update_data = job_application_update.model_dump(exclude_unset=True)
+
+    # Archive state is updated through the same flow as other editable fields.
+    # We intentionally do not derive or overwrite workflow status here.
+    for field, value in update_data.items():
+        if field in ARCHIVE_UPDATE_FIELDS:
+            setattr(db_job_application, field, value)
+            continue
+
+        setattr(db_job_application, field, value)
+
+
 def update_job_application(
     db: Session, job_application_id: int, job_application_update: JobApplicationUpdate
 ) -> JobApplication | None:
@@ -61,9 +79,8 @@ def update_job_application(
     )
     if not db_job_application:
         return None
-    update_data = job_application_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_job_application, field, value)
+
+    apply_job_application_updates(db_job_application, job_application_update)
     db.commit()
     db.refresh(db_job_application)
     return db_job_application
