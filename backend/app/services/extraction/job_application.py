@@ -30,6 +30,62 @@ class JobApplicationExtractionAdapter:
             "Do not invent missing facts."
         )
 
+    def response_json_schema(self) -> dict[str, Any]:
+        nullable_string = {
+            "type": ["string", "null"],
+        }
+        return {
+            "type": "object",
+            "properties": {
+                "company_name": {
+                    **nullable_string,
+                    "description": "Hiring company name from the job page.",
+                },
+                "job_title": {
+                    **nullable_string,
+                    "description": "Job title exactly as shown on the page when possible.",
+                },
+                "location": {
+                    **nullable_string,
+                    "description": "Job location or geography shown on the page.",
+                },
+                "full_description": {
+                    **nullable_string,
+                    "description": "Readable full job description text summarized from the page without navigation noise.",
+                },
+                "required_skills": {
+                    **nullable_string,
+                    "description": "Comma-separated required skills or technologies explicitly mentioned on the page.",
+                },
+                "short_description": {
+                    **nullable_string,
+                    "description": "Short high-level summary of the role.",
+                },
+                "source": {
+                    **nullable_string,
+                    "description": "Source website name when it is clear from the page.",
+                },
+                "source_link": {
+                    **nullable_string,
+                    "description": "Source page URL when present in the content.",
+                },
+                "job_link": {
+                    **nullable_string,
+                    "description": "Canonical job posting URL when present in the content.",
+                },
+                "work_mode": {
+                    **nullable_string,
+                    "description": "Remote, onsite, hybrid, or null if unclear.",
+                },
+                "salary_range": {
+                    **nullable_string,
+                    "description": "Salary or compensation range only if stated clearly.",
+                },
+            },
+            "required": sorted(JOB_APPLICATION_ALLOWED_FIELDS),
+            "additionalProperties": False,
+        }
+
     def normalize(self, payload: dict[str, Any]) -> ExtractionResult:
         data = {
             key: value

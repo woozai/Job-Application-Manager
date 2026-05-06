@@ -29,6 +29,7 @@ class ExtractionOrchestrator:
         payload = self._ai_client.extract(
             content=content,
             schema_instructions=adapter.schema_instructions(),
+            response_json_schema=adapter.response_json_schema(),
         )
         return adapter.normalize(payload)
 

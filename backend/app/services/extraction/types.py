@@ -74,6 +74,10 @@ class EntityExtractionAdapter(Protocol):
         """Return entity-specific AI instructions."""
         ...
 
+    def response_json_schema(self) -> dict[str, Any]:
+        """Return the JSON schema enforced by the AI provider."""
+        ...
+
     def normalize(self, payload: dict[str, Any]) -> ExtractionResult:
         """Convert AI JSON into validated response data for the target entity."""
         ...
