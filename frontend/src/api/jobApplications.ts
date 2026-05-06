@@ -51,6 +51,31 @@ export function updateJobApplication(
   });
 }
 
+export function archiveJobApplication(
+  jobApplicationId: number,
+  token: string,
+  archiveReason?: string | null,
+) {
+  return updateJobApplication(
+    jobApplicationId,
+    {
+      is_archived: true,
+      archive_reason: archiveReason ?? null,
+    },
+    token,
+  );
+}
+
+export function restoreJobApplication(jobApplicationId: number, token: string) {
+  return updateJobApplication(
+    jobApplicationId,
+    {
+      is_archived: false,
+    },
+    token,
+  );
+}
+
 export function deleteJobApplication(jobApplicationId: number, token: string) {
   return apiRequest<ApiMessageResponse>(`/job-applications/${jobApplicationId}`, {
     method: "DELETE",
