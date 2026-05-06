@@ -82,14 +82,25 @@ export function JobApplicationExtractionSection({
         ) : null}
       </div>
 
-      {extractError ? <p className="form-error">{extractError}</p> : null}
+      {extractError ? (
+        <section className="feedback-panel feedback-panel--error" role="alert">
+          <p className="feedback-panel__eyebrow">Extraction issue</p>
+          <h3>We could not fully read that job link</h3>
+          <p>{extractError}</p>
+          <p>Manual entry is still available, and pasted job text usually works well for LinkedIn or blocked pages.</p>
+        </section>
+      ) : null}
       {extractWarnings.length > 0 ? (
         <div className="job-form__warnings" role="status">
+          <p className="job-form__warnings-title">Extraction notes</p>
           {extractWarnings.map((warning) => (
             <p className="form-hint" key={warning}>
               {warning}
             </p>
           ))}
+          <p className="form-hint">
+            You can retry anytime. Existing edits stay in place, and only empty fields are filled.
+          </p>
         </div>
       ) : null}
     </section>

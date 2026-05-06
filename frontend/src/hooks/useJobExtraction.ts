@@ -57,9 +57,13 @@ export function useJobExtraction({ token }: UseJobExtractionOptions) {
       return response;
     } catch (error) {
       if (error instanceof ApiError) {
-        setExtractError(error.message);
+        setExtractError(
+          `${error.message} You can keep filling the form manually or paste the job description below and try again.`,
+        );
       } else {
-        setExtractError("We could not extract job details right now. Please try again.");
+        setExtractError(
+          "We could not extract job details right now. You can keep filling the form manually or paste the job description below and try again.",
+        );
       }
       return null;
     } finally {
