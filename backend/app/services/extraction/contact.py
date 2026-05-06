@@ -23,6 +23,9 @@ class ContactExtractionAdapter:
     def response_json_schema(self) -> dict[str, Any]:
         return build_contact_response_json_schema()
 
+    def warning_fields(self) -> set[str]:
+        return {"name", "company", "job_title"}
+
     def normalize(self, payload: dict[str, Any]) -> ExtractionResult:
         data = {
             key: value for key, value in payload.items() if key in CONTACT_ALLOWED_FIELDS

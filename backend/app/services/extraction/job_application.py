@@ -6,6 +6,7 @@ from typing import Literal
 from app.services.extraction.entities.job_application import (
     JOB_APPLICATION_FIELD_ORDER,
     JOB_APPLICATION_MAX_FIELD_LENGTHS,
+    JOB_APPLICATION_PRIMARY_FIELDS,
     JOB_APPLICATION_URL_FIELDS,
     build_job_application_response_json_schema,
 )
@@ -25,6 +26,9 @@ class JobApplicationExtractionAdapter:
 
     def response_json_schema(self) -> dict[str, Any]:
         return build_job_application_response_json_schema()
+
+    def warning_fields(self) -> set[str]:
+        return JOB_APPLICATION_PRIMARY_FIELDS
 
     def normalize(self, payload: dict[str, Any]) -> ExtractionResult:
         data: dict[str, Any] = {}

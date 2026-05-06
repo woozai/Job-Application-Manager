@@ -81,6 +81,10 @@ class EntityExtractionAdapter(Protocol):
         """Return the JSON schema enforced by the AI provider."""
         ...
 
+    def warning_fields(self) -> set[str]:
+        """Return important fields that should generate warnings when missing."""
+        ...
+
     def normalize(self, payload: dict[str, Any]) -> ExtractionResult:
         """Convert AI JSON into validated response data for the target entity."""
         ...

@@ -1,6 +1,10 @@
 """Shared link-extraction service boundary."""
 
-from app.services.extraction.orchestrator import ExtractionOrchestrator
+from app.services.extraction.orchestrator import (
+    ExtractionOrchestrator,
+    build_default_extraction_orchestrator,
+    extract_from_link,
+)
 from app.services.extraction.registry import (
     EntityExtractionRegistry,
     build_default_entity_extraction_registry,
@@ -28,4 +32,6 @@ __all__ = [
     "ReadableContent",
     "UnsupportedEntityTypeError",
     "build_default_entity_extraction_registry",
+    "build_default_extraction_orchestrator",
+    "extract_from_link",
 ]
