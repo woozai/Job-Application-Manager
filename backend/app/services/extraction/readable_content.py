@@ -5,6 +5,8 @@ from html import unescape
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 
+from pydantic import HttpUrl
+
 from app.services.extraction.types import ReadableContent, ReadableContentError
 
 WHITESPACE_PATTERN = re.compile(r"\s+")
@@ -126,7 +128,7 @@ def _cleanup_readable_text(text: str) -> str:
 class ReadableContentExtractor:
     """Converts fetched page content into AI-ready readable text."""
 
-    def extract(self, source_url: str, html: str) -> ReadableContent:
+    def extract(self, source_url: HttpUrl, html: str) -> ReadableContent:
         normalized_html = html.strip()
         if not normalized_html:
             raise ReadableContentError(
@@ -139,7 +141,7 @@ class ReadableContentExtractor:
 
         readable_text = _cleanup_readable_text(parser.text)
         if len(readable_text) < THIN_CONTENT_MIN_LENGTH:
-            hostname = urlparse(source_url).hostname or "this page"
+            hostname = urlparse(str(source_url)).hostname or "this page"
             raise ReadableContentError(
                 f"We could not find enough readable content on {hostname}. Please paste the job description instead."
             )

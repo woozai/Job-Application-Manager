@@ -40,4 +40,4 @@ class ExtractionOrchestrator:
             )
 
         html = self._fetcher.fetch(str(request.url))
-        return self._readable_content_extractor.extract(str(request.url), html)
+        return self._readable_content_extractor.extract(request.url, html)
