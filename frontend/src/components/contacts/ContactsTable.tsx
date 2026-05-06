@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import type { ContactResponse } from "../../types/contact";
 import { getContactResponseStatusTone } from "../../utils/contactResponseStatusTone";
+import { getSafeExternalUrl } from "../../utils/display";
 import { StatusBadge } from "../ui/StatusBadge";
 
 function formatValue(value: string | null | undefined, fallback = "Not set") {
@@ -129,6 +130,7 @@ export function ContactsTable({
           <tbody>
             {contacts.map((contact) => {
               const jobTitle = contact.job_title?.trim() ?? "";
+              const profileUrl = getSafeExternalUrl(contact.profile_link);
 
               return (
                 <tr key={contact.id}>
@@ -198,6 +200,18 @@ export function ContactsTable({
                   </td>
                   <td>
                     <div className="contacts-table__actions">
+                      {profileUrl ? (
+                        <a
+                          aria-label={`Open ${contact.name} profile`}
+                          className="contacts-table__action-button contacts-table__action-button--profile"
+                          href={profileUrl}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          title="Open profile"
+                        >
+                          <span aria-hidden="true">↗</span>
+                        </a>
+                      ) : null}
                       <button
                         aria-label={`Edit ${contact.name}`}
                         className="contacts-table__action-button contacts-table__action-button--edit"

@@ -106,6 +106,18 @@
   background: rgba(204, 251, 241, 0.8);
 }
 
+.contacts-table__action-button--profile {
+  border-color: rgba(37, 99, 235, 0.22);
+  color: #1d4ed8;
+  background: rgba(239, 246, 255, 0.95);
+  text-decoration: none;
+}
+
+.contacts-table__action-button--profile:hover {
+  border-color: rgba(37, 99, 235, 0.38);
+  background: rgba(219, 234, 254, 0.92);
+}
+
 .contacts-table__action-button--delete {
   border-color: rgba(185, 28, 28, 0.2);
   color: #991b1b;
