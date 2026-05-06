@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ContactDeletePanel } from "../components/contacts/ContactDeletePanel";
 import { ContactForm } from "../components/contacts/ContactForm";
 import { ContactsTable } from "../components/contacts/ContactsTable";
+import { JobApplicationArchiveNotice } from "../components/job-applications/JobApplicationArchiveNotice";
 import { JobApplicationDeletePanel } from "../components/job-applications/JobApplicationDeletePanel";
 import { JobApplicationDetailsSections } from "../components/job-applications/JobApplicationDetailsSections";
 import { ErrorState } from "../components/ui/ErrorState";
@@ -94,19 +95,7 @@ export function JobApplicationDetailsPage() {
             <p className="page-card__body">
               Review the full job record, process details, and related networking contacts in one place.
             </p>
-            {currentJobApplication.is_archived ? (
-              <div className="details-hero__archive">
-                <p className="page-card__eyebrow">Archived</p>
-                <p className="page-card__body">
-                  This job is archived and hidden from the active dashboard.
-                  {currentJobApplication.archived_at ? ` Archived on ${new Date(currentJobApplication.archived_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}.` : ""}
-                </p>
-              </div>
-            ) : null}
+            <JobApplicationArchiveNotice jobApplication={currentJobApplication} />
           </div>
 
           <div className="details-hero__actions">

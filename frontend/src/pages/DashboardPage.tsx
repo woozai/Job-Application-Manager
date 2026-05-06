@@ -7,8 +7,10 @@ import {
   restoreJobApplication,
 } from "../api/jobApplications";
 import { ApiError } from "../api/client";
+import { DashboardArchiveEmptyState } from "../components/dashboard/DashboardArchiveState";
 import { DashboardFiltersPanel } from "../components/dashboard/DashboardFiltersPanel";
 import { DashboardStats } from "../components/dashboard/DashboardStats";
+import { DashboardViewSwitch } from "../components/dashboard/DashboardViewSwitch";
 import { JobApplicationCard } from "../components/job-applications/JobApplicationCard";
 import { ErrorState } from "../components/ui/ErrorState";
 import { LoadingState } from "../components/ui/LoadingState";
@@ -153,26 +155,7 @@ export function DashboardPage() {
               : "Your dashboard keeps applications, networking activity, and next steps in one focused workspace."}
           </p>
           {jobApplications.length > 0 ? (
-            <div className="dashboard-view-switch" role="tablist" aria-label="Dashboard job views">
-              <button
-                aria-selected={viewMode === "active"}
-                className={`button-link dashboard-view-switch__button${viewMode === "active" ? " dashboard-view-switch__button--active" : ""}`}
-                onClick={() => setViewMode("active")}
-                role="tab"
-                type="button"
-              >
-                Active jobs
-              </button>
-              <button
-                aria-selected={viewMode === "archived"}
-                className={`button-link dashboard-view-switch__button${viewMode === "archived" ? " dashboard-view-switch__button--active" : ""}`}
-                onClick={() => setViewMode("archived")}
-                role="tab"
-                type="button"
-              >
-                Archived jobs
-              </button>
-            </div>
+            <DashboardViewSwitch onChange={setViewMode} viewMode={viewMode} />
           ) : null}
         </div>
 
@@ -236,53 +219,30 @@ export function DashboardPage() {
       !isArchiveView &&
       jobApplications.length > 0 &&
       filters.scopedJobApplications.length === 0 ? (
-        <section className="page-card dashboard-empty-state">
-          <p className="page-card__eyebrow">Active dashboard clear</p>
-          <h2>No active jobs right now</h2>
-          <p className="page-card__body">
-            Your active dashboard is currently empty. You can create a new application or switch to
-            archived jobs to review older opportunities.
-          </p>
-          <div className="dashboard-filters__actions">
-            <Link className="button-link button-link--primary" to="/job-applications/new">
-              Create new application
-            </Link>
-            <button className="button-link" onClick={() => setViewMode("archived")} type="button">
-              View archived jobs
-            </button>
-          </div>
-        </section>
+        <DashboardArchiveEmptyState
+          isArchiveView={false}
+          mode="no-active-jobs"
+          onSwitchView={setViewMode}
+        />
       ) : null}
 
       {!isLoadingApplications &&
       !loadError &&
       isArchiveView &&
       filters.scopedJobApplications.length === 0 ? (
-        <section className="page-card dashboard-empty-state">
-          <p className="page-card__eyebrow">Archive empty</p>
-          <h2>No archived jobs yet</h2>
-          <p className="page-card__body">
-            Archived applications will appear here once you move them out of the active dashboard.
-          </p>
-          <button className="button-link" onClick={() => setViewMode("active")} type="button">
-            Back to active jobs
-          </button>
-        </section>
+        <DashboardArchiveEmptyState
+          isArchiveView
+          mode="no-archived-jobs"
+          onSwitchView={setViewMode}
+        />
       ) : null}
 
       {!isLoadingApplications && !loadError && filters.scopedJobApplications.length > 0 && filters.filteredJobApplications.length === 0 ? (
-        <section className="page-card dashboard-empty-state">
-          <p className="page-card__eyebrow">No matching results</p>
-          <h2>{isArchiveView ? "No archived jobs match your filters" : "No active jobs match your filters"}</h2>
-          <p className="page-card__body">
-            {isArchiveView
-              ? "Try broadening your search or clearing a filter to see more archived opportunities."
-              : "Try broadening your search or clearing a filter to see more active opportunities."}
-          </p>
-          <button className="button-link" onClick={filters.resetFilters} type="button">
-            Reset filters
-          </button>
-        </section>
+        <DashboardArchiveEmptyState
+          isArchiveView={isArchiveView}
+          mode="no-filter-results"
+          onResetFilters={filters.resetFilters}
+        />
       ) : null}
 
       {!isLoadingApplications && !loadError && filters.filteredJobApplications.length > 0 ? (

@@ -16,6 +16,9 @@ export const jobApplicationStatuses = [
 ] as const;
 
 export type JobApplicationStatus = (typeof jobApplicationStatuses)[number];
+export const jobApplicationWorkflowStatuses = jobApplicationStatuses.filter(
+  (status) => status !== "archived",
+);
 
 export interface JobApplicationResponse {
   id: number;

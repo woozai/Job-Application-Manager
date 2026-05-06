@@ -21,6 +21,26 @@
   background: rgba(148, 163, 184, 0.12);
 }
 
+.details-archive-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.details-archive-meta dt,
+.details-archive-meta dd {
+  margin: 0;
+}
+
+.details-archive-meta dt {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
 .details-hero__content h2,
 .details-section__header h2,
 .details-grid dt,
