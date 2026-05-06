@@ -12,6 +12,15 @@
   flex: 1 1 380px;
 }
 
+.details-hero__archive {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: rgba(148, 163, 184, 0.12);
+}
+
 .details-hero__content h2,
 .details-section__header h2,
 .details-grid dt,
