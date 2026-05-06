@@ -11,7 +11,6 @@ JOB_APPLICATION_PRIMARY_FIELDS = {
 JOB_APPLICATION_OPTIONAL_FIELDS = {
     "short_description",
     "source",
-    "source_link",
     "job_link",
     "work_mode",
     "salary_range",
@@ -27,13 +26,12 @@ JOB_APPLICATION_FIELD_ORDER = [
     "required_skills",
     "short_description",
     "source",
-    "source_link",
     "job_link",
     "work_mode",
     "salary_range",
 ]
 
-JOB_APPLICATION_URL_FIELDS = {"source_link", "job_link"}
+JOB_APPLICATION_URL_FIELDS = {"job_link"}
 
 JOB_APPLICATION_MAX_FIELD_LENGTHS = {
     "company_name": 255,
@@ -41,7 +39,6 @@ JOB_APPLICATION_MAX_FIELD_LENGTHS = {
     "location": 255,
     "short_description": 2000,
     "source": 100,
-    "source_link": 2048,
     "job_link": 2048,
     "work_mode": 50,
     "salary_range": 100,
@@ -84,10 +81,6 @@ def build_job_application_response_json_schema() -> dict[str, object]:
             "source": {
                 **nullable_string,
                 "description": "Source website name when it is clear from the page.",
-            },
-            "source_link": {
-                **nullable_string,
-                "description": "Source page URL when present in the content.",
             },
             "job_link": {
                 **nullable_string,

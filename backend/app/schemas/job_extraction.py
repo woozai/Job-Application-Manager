@@ -27,7 +27,6 @@ class JobExtractionData(BaseSchema):
     required_skills: str | None = None
     short_description: str | None = None
     source: str | None = None
-    source_link: str | None = None
     job_link: str | None = None
     work_mode: str | None = None
     salary_range: str | None = None

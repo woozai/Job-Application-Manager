@@ -42,9 +42,8 @@ def create_job_application(client: TestClient, token: str) -> dict:
     ("field_name", "unsafe_url"),
     [
         ("job_link", "javascript:alert(1)"),
-        ("source_link", "data:text/html,<script>alert(1)</script>"),
         ("job_link", "vbscript:msgbox(1)"),
-        ("source_link", "not-a-valid-url"),
+        ("job_link", "not-a-valid-url"),
     ],
 )
 def test_job_application_rejects_unsafe_urls(
@@ -80,13 +79,11 @@ def test_job_application_normalizes_empty_url_fields(client: TestClient) -> None
             "company_name": "OpenAI",
             "job_title": "Frontend Engineer",
             "job_link": "   ",
-            "source_link": "",
         },
     )
 
     assert response.status_code == 200
     assert response.json()["job_link"] is None
-    assert response.json()["source_link"] is None
 
 
 @pytest.mark.parametrize(

@@ -12,7 +12,6 @@ export interface JobApplicationFormValues {
   company_name: string;
   job_title: string;
   job_link: string;
-  source_link: string;
   source: string;
   application_date: string;
   status: string;
@@ -31,7 +30,6 @@ export interface JobApplicationFormValues {
   next_action_date: string;
   interview_stage: string;
   rejection_reason: string;
-  tags: string;
 }
 
 export interface JobApplicationFormErrors {
@@ -50,12 +48,11 @@ export const priorityOptions = ["low", "medium", "high"];
 export function createInitialValues(initialData?: JobApplicationResponse): JobApplicationFormValues {
   return {
     extraction_mode: "link",
-    extraction_link: initialData?.job_link ?? initialData?.source_link ?? "",
+    extraction_link: initialData?.job_link ?? "",
     extraction_raw_text: "",
     company_name: initialData?.company_name ?? "",
     job_title: initialData?.job_title ?? "",
     job_link: initialData?.job_link ?? "",
-    source_link: initialData?.source_link ?? "",
     source: initialData?.source ?? "",
     application_date: initialData?.application_date ?? "",
     status: initialData?.status ?? "saved",
@@ -74,7 +71,6 @@ export function createInitialValues(initialData?: JobApplicationResponse): JobAp
     next_action_date: initialData?.next_action_date ?? "",
     interview_stage: initialData?.interview_stage ?? "",
     rejection_reason: initialData?.rejection_reason ?? "",
-    tags: initialData?.tags ?? "",
   };
 }
 
@@ -102,7 +98,6 @@ export function buildPayload(values: JobApplicationFormValues): JobApplicationCr
     company_name: values.company_name.trim(),
     job_title: values.job_title.trim(),
     job_link: normalizeOptionalValue(values.job_link),
-    source_link: normalizeOptionalValue(values.source_link),
     source: normalizeOptionalValue(values.source),
     application_date: normalizeOptionalValue(values.application_date),
     status: normalizeOptionalValue(values.status) as JobApplicationCreateInput["status"],
@@ -121,7 +116,6 @@ export function buildPayload(values: JobApplicationFormValues): JobApplicationCr
     next_action_date: normalizeOptionalValue(values.next_action_date),
     interview_stage: normalizeOptionalValue(values.interview_stage),
     rejection_reason: normalizeOptionalValue(values.rejection_reason),
-    tags: normalizeOptionalValue(values.tags),
   };
 }
 
@@ -133,7 +127,6 @@ const extractionFieldMap = [
   "required_skills",
   "short_description",
   "source",
-  "source_link",
   "job_link",
   "work_mode",
   "salary_range",

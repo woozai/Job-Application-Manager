@@ -26,7 +26,6 @@ export interface JobApplicationResponse {
   company_name: string;
   job_title: string;
   job_link: string | null;
-  source_link: string | null;
   source: string | null;
   application_date: string | null;
   status: JobApplicationStatus | null;
@@ -45,7 +44,6 @@ export interface JobApplicationResponse {
   next_action_date: string | null;
   interview_stage: string | null;
   rejection_reason: string | null;
-  tags: string | null;
   is_archived: boolean;
   archived_at: string | null;
   archive_reason: string | null;
@@ -58,7 +56,6 @@ export interface JobApplicationCreateInput {
   company_name: string;
   job_title: string;
   job_link?: string | null;
-  source_link?: string | null;
   source?: string | null;
   application_date?: string | null;
   status?: JobApplicationStatus | null;
@@ -77,14 +74,12 @@ export interface JobApplicationCreateInput {
   next_action_date?: string | null;
   interview_stage?: string | null;
   rejection_reason?: string | null;
-  tags?: string | null;
 }
 
 export interface JobApplicationUpdateInput {
   company_name?: string;
   job_title?: string;
   job_link?: string | null;
-  source_link?: string | null;
   source?: string | null;
   application_date?: string | null;
   status?: JobApplicationStatus | null;
@@ -103,7 +98,6 @@ export interface JobApplicationUpdateInput {
   next_action_date?: string | null;
   interview_stage?: string | null;
   rejection_reason?: string | null;
-  tags?: string | null;
   is_archived?: boolean;
   archived_at?: string | null;
   archive_reason?: string | null;
@@ -122,7 +116,6 @@ export interface JobExtractionData {
   required_skills: string | null;
   short_description: string | null;
   source: string | null;
-  source_link: string | null;
   job_link: string | null;
   work_mode: string | null;
   salary_range: string | null;
