@@ -92,3 +92,21 @@ def test_job_application_adapter_caps_large_text_fields() -> None:
     assert result.data["required_skills"] is not None
     assert len(result.data["full_description"]) == JOB_APPLICATION_MAX_FIELD_LENGTHS["full_description"]
     assert len(result.data["required_skills"]) == JOB_APPLICATION_MAX_FIELD_LENGTHS["required_skills"]
+
+
+def test_job_application_adapter_preserves_markdown_structure() -> None:
+    adapter = JobApplicationExtractionAdapter()
+
+    result = adapter.normalize(
+        {
+            "company_name": "Example Inc",
+            "job_title": "Backend Engineer",
+            "short_description": "## Summary\n\n- Python\n- FastAPI",
+            "full_description": "# Role\n\nBuild APIs.\n\n## Responsibilities\n- Ship features\n- Write tests",
+            "required_skills": "- Python\n- FastAPI\n- SQLAlchemy",
+        }
+    )
+
+    assert result.data["short_description"] == "## Summary\n\n- Python\n- FastAPI"
+    assert result.data["full_description"] == "# Role\n\nBuild APIs.\n\n## Responsibilities\n- Ship features\n- Write tests"
+    assert result.data["required_skills"] == "- Python\n- FastAPI\n- SQLAlchemy"

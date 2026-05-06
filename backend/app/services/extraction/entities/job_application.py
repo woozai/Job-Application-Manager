@@ -71,15 +71,15 @@ def build_job_application_response_json_schema() -> dict[str, object]:
             },
             "full_description": {
                 **nullable_string,
-                "description": "Readable full job description text from the page without navigation noise.",
+                "description": "Readable full job description in Markdown, preserving useful paragraphs and bullet lists from the page without navigation noise.",
             },
             "required_skills": {
                 **nullable_string,
-                "description": "Comma-separated required skills or technologies explicitly mentioned on the page.",
+                "description": "Required skills or technologies explicitly mentioned on the page, formatted as Markdown when a list is helpful.",
             },
             "short_description": {
                 **nullable_string,
-                "description": "Short high-level summary of the role.",
+                "description": "Short high-level Markdown summary of the role.",
             },
             "source": {
                 **nullable_string,

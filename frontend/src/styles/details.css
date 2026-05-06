@@ -130,3 +130,103 @@
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
+
+.markdown-text {
+  display: grid;
+  justify-items: start;
+  gap: 0.55rem;
+}
+
+.markdown-text__content {
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.markdown-text__content--collapsed {
+  position: relative;
+  overflow: hidden;
+}
+
+.markdown-text__content--collapsed::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.95));
+}
+
+.markdown-text__paragraph,
+.markdown-text__heading,
+.markdown-text__blockquote,
+.markdown-text__list,
+.markdown-text__pre {
+  margin: 0 0 0.85rem;
+}
+
+.markdown-text__paragraph:last-child,
+.markdown-text__heading:last-child,
+.markdown-text__blockquote:last-child,
+.markdown-text__list:last-child,
+.markdown-text__pre:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-text__heading {
+  line-height: 1.2;
+}
+
+.markdown-text__heading--1,
+.markdown-text__heading--2 {
+  font-size: 1.05rem;
+}
+
+.markdown-text__heading--3,
+.markdown-text__heading--4,
+.markdown-text__heading--5,
+.markdown-text__heading--6 {
+  font-size: 0.98rem;
+}
+
+.markdown-text__list {
+  padding-left: 1.2rem;
+}
+
+.markdown-text__blockquote {
+  padding-left: 0.9rem;
+  border-left: 3px solid rgba(13, 148, 136, 0.28);
+  color: var(--color-muted);
+}
+
+.markdown-text__pre,
+.markdown-text__code {
+  font-family: "IBM Plex Mono", "Fira Code", monospace;
+}
+
+.markdown-text__pre {
+  padding: 0.8rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.06);
+  overflow: auto;
+}
+
+.markdown-text__code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.08);
+  font-size: 0.95em;
+}
+
+.markdown-text__link,
+.markdown-text__button {
+  color: var(--color-accent-strong);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.markdown-text__button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}

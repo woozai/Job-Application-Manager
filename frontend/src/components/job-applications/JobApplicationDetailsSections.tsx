@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { ExpandableText } from "../ui/ExpandableText";
+import { MarkdownText } from "../ui/MarkdownText";
 import type { JobApplicationResponse } from "../../types/jobApplication";
 import { formatDisplayDate, formatDisplayValue } from "../../utils/display";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
@@ -58,10 +59,10 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
     {
       title: "Descriptions and notes",
       items: [
-        { label: "Short description", value: <ExpandableText maxLength={180} text={jobApplication.short_description} /> },
-        { label: "Full description", value: <ExpandableText maxLength={220} text={jobApplication.full_description} /> },
-        { label: "Required skills", value: <ExpandableText maxLength={180} text={jobApplication.required_skills} /> },
-        { label: "Notes", value: <ExpandableText maxLength={180} text={jobApplication.notes} /> },
+        { label: "Short description", value: <MarkdownText collapsedHeight={180} markdown={jobApplication.short_description} /> },
+        { label: "Full description", value: <MarkdownText collapsedHeight={260} markdown={jobApplication.full_description} /> },
+        { label: "Required skills", value: <MarkdownText collapsedHeight={180} markdown={jobApplication.required_skills} /> },
+        { label: "Notes", value: <MarkdownText collapsedHeight={180} markdown={jobApplication.notes} /> },
         { label: "Tags", value: formatDisplayValue(jobApplication.tags) },
       ],
     },
