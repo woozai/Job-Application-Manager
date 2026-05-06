@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from app.services.extraction.entities.job_application import JOB_APPLICATION_MAX_FIELD_LENGTHS
 from app.services.extraction.job_application import JobApplicationExtractionAdapter
 
 
@@ -71,3 +72,23 @@ def test_job_application_adapter_keeps_unknown_or_unsafe_optional_values_null() 
         "work_mode": None,
         "salary_range": None,
     }
+
+
+def test_job_application_adapter_caps_large_text_fields() -> None:
+    adapter = JobApplicationExtractionAdapter()
+    long_description = "A" * (JOB_APPLICATION_MAX_FIELD_LENGTHS["full_description"] + 50)
+    long_skills = "B" * (JOB_APPLICATION_MAX_FIELD_LENGTHS["required_skills"] + 50)
+
+    result = adapter.normalize(
+        {
+            "company_name": "Example Inc",
+            "job_title": "Backend Engineer",
+            "full_description": long_description,
+            "required_skills": long_skills,
+        }
+    )
+
+    assert result.data["full_description"] is not None
+    assert result.data["required_skills"] is not None
+    assert len(result.data["full_description"]) == JOB_APPLICATION_MAX_FIELD_LENGTHS["full_description"]
+    assert len(result.data["required_skills"]) == JOB_APPLICATION_MAX_FIELD_LENGTHS["required_skills"]
