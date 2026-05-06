@@ -7,7 +7,11 @@ from pydantic import Field, field_validator
 
 from app.schemas.base import BaseSchema
 from app.schemas.contact import ContactResponse
-from app.schemas.validators import validate_optional_http_url
+from app.schemas.validators import (
+    validate_optional_http_url,
+    validate_optional_text,
+    validate_required_text,
+)
 
 JobApplicationStatus = Literal[
     "saved",
@@ -90,6 +94,33 @@ class JobApplicationBase(BaseSchema):
     @classmethod
     def validate_external_links(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
+
+    @field_validator("company_name", "job_title", mode="before")
+    @classmethod
+    def validate_required_text_fields(cls, value: object, info) -> str:
+        return validate_required_text(value, field_name=info.field_name.replace("_", " ").title())
+
+    @field_validator(
+        "source",
+        "short_description",
+        "full_description",
+        "required_skills",
+        "notes",
+        "location",
+        "work_mode",
+        "application_type",
+        "priority",
+        "salary_range",
+        "resume_version",
+        "recruiter_name",
+        "interview_stage",
+        "rejection_reason",
+        "tags",
+        mode="before",
+    )
+    @classmethod
+    def normalize_optional_text_fields(cls, value: object, info) -> str | None:
+        return validate_optional_text(value, field_name=info.field_name.replace("_", " ").title())
 
 
 class JobApplicationCreate(JobApplicationBase):
@@ -174,6 +205,31 @@ class JobApplicationUpdate(BaseSchema):
     @classmethod
     def validate_external_links(cls, value: object) -> str | None:
         return validate_optional_http_url(value)
+
+    @field_validator(
+        "company_name",
+        "job_title",
+        "source",
+        "short_description",
+        "full_description",
+        "required_skills",
+        "notes",
+        "location",
+        "work_mode",
+        "application_type",
+        "priority",
+        "salary_range",
+        "resume_version",
+        "recruiter_name",
+        "interview_stage",
+        "rejection_reason",
+        "tags",
+        "archive_reason",
+        mode="before",
+    )
+    @classmethod
+    def normalize_optional_text_fields(cls, value: object, info) -> str | None:
+        return validate_optional_text(value, field_name=info.field_name.replace("_", " ").title())
 
 
 class JobApplicationResponse(JobApplicationBase):
