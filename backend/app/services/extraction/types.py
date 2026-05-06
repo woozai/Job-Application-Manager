@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Protocol
 
-from pydantic import Field, HttpUrl
+from pydantic import Field, HttpUrl, field_validator
 
 from app.schemas.base import BaseSchema
 
@@ -11,6 +11,10 @@ EntityType = Literal["job_application", "contact"]
 
 class ExtractionError(Exception):
     """Base error for extraction pipeline failures."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.message = message
 
 
 class UnsupportedEntityTypeError(ExtractionError):
@@ -36,6 +40,18 @@ class ExtractionRequest(BaseSchema):
         default=None,
         description="Optional manually supplied text used when the URL content is unavailable or thin.",
     )
+
+    @field_validator("raw_text", mode="before")
+    @classmethod
+    def normalize_raw_text(cls, value: object) -> str | None:
+        if value is None:
+            return None
+
+        if not isinstance(value, str):
+            raise ValueError("raw_text must be a string")
+
+        normalized_value = value.strip()
+        return normalized_value or None
 
 
 class ReadableContent(BaseSchema):
