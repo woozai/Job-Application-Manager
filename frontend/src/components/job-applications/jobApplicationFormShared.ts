@@ -1,4 +1,4 @@
-import { jobApplicationStatuses } from "../../types/jobApplication";
+import { jobApplicationWorkflowStatuses } from "../../types/jobApplication";
 import type {
   JobApplicationCreateInput,
   JobApplicationResponse,
@@ -35,7 +35,7 @@ export interface JobApplicationFormErrors {
   job_title?: string;
 }
 
-export const statusOptions = jobApplicationStatuses;
+export const statusOptions = jobApplicationWorkflowStatuses;
 
 export const workModeOptions = ["remote", "hybrid", "onsite"];
 export const applicationTypeOptions = ["direct", "through connection", "recruiter"];

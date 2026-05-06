@@ -160,6 +160,15 @@ class JobApplicationUpdate(BaseSchema):
     tags: Optional[str] = Field(
         None, description="Tags associated with the application"
     )
+    is_archived: Optional[bool] = Field(
+        None, description="Whether the job is archived from the active dashboard"
+    )
+    archived_at: Optional[datetime] = Field(
+        None, description="When the job was archived"
+    )
+    archive_reason: Optional[str] = Field(
+        None, description="Optional reason for archiving the job"
+    )
 
     @field_validator("job_link", "source_link", mode="before")
     @classmethod
@@ -170,6 +179,15 @@ class JobApplicationUpdate(BaseSchema):
 class JobApplicationResponse(JobApplicationBase):
     id: int = Field(..., description="Unique identifier for the job application")
     user_id: int = Field(..., description="ID of the user who owns the application")
+    is_archived: bool = Field(
+        ..., description="Whether the job is archived from the active dashboard"
+    )
+    archived_at: Optional[datetime] = Field(
+        None, description="When the job was archived"
+    )
+    archive_reason: Optional[str] = Field(
+        None, description="Optional reason for archiving the job"
+    )
     contacts: List[ContactResponse] = Field(
         default_factory=list,
         description="List of contacts associated with the application",
