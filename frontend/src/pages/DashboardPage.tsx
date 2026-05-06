@@ -13,6 +13,8 @@ import { useDashboardFilters } from "../hooks/useDashboardFilters";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import type { JobApplicationResponse } from "../types/jobApplication";
 
+type DashboardViewMode = "active" | "archived";
+
 export function DashboardPage() {
   useDocumentTitle("Dashboard | Job Application Manager");
   const { currentUser, token } = useAuth();
@@ -22,7 +24,9 @@ export function DashboardPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isLoadingApplications, setIsLoadingApplications] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<DashboardViewMode>("active");
   const filters = useDashboardFilters(jobApplications);
+  const isArchiveView = viewMode === "archived";
 
   useEffect(() => {
     const routeState = location.state as { successMessage?: string } | null;
@@ -80,6 +84,28 @@ export function DashboardPage() {
               ? `Welcome back, ${currentUser.username}. Your dashboard now loads live job applications from the backend and keeps your search organized.`
               : "Your dashboard keeps applications, networking activity, and next steps in one focused workspace."}
           </p>
+          {jobApplications.length > 0 ? (
+            <div className="dashboard-view-switch" role="tablist" aria-label="Dashboard job views">
+              <button
+                aria-selected={viewMode === "active"}
+                className={`button-link dashboard-view-switch__button${viewMode === "active" ? " dashboard-view-switch__button--active" : ""}`}
+                onClick={() => setViewMode("active")}
+                role="tab"
+                type="button"
+              >
+                Active jobs
+              </button>
+              <button
+                aria-selected={viewMode === "archived"}
+                className={`button-link dashboard-view-switch__button${viewMode === "archived" ? " dashboard-view-switch__button--active" : ""}`}
+                onClick={() => setViewMode("archived")}
+                role="tab"
+                type="button"
+              >
+                Archived jobs
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <div className="dashboard-hero__actions">
@@ -154,8 +180,8 @@ export function DashboardPage() {
         <section className="dashboard-section">
           <div className="dashboard-section__header">
             <div>
-              <p className="page-card__eyebrow">Applications</p>
-              <h2>Recent opportunities</h2>
+              <p className="page-card__eyebrow">{isArchiveView ? "Archive" : "Applications"}</p>
+              <h2>{isArchiveView ? "Archived opportunities" : "Recent opportunities"}</h2>
             </div>
             <p className="dashboard-section__meta">
               Showing {filters.filteredJobApplications.length} of {jobApplications.length}

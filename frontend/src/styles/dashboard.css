@@ -18,6 +18,23 @@
   justify-items: start;
 }
 
+.dashboard-view-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.dashboard-view-switch__button {
+  border-color: rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.dashboard-view-switch__button--active {
+  border-color: rgba(13, 148, 136, 0.24);
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--color-accent-strong);
+}
+
 .dashboard-hero__hint,
 .dashboard-section__meta,
 .dashboard-job-card__description,
