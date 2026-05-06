@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Any
 
 from google import genai
@@ -8,6 +9,8 @@ from google.genai import errors as genai_errors
 
 from app.core.config import settings
 from app.services.extraction.types import AIExtractionError, ReadableContent
+
+logger = logging.getLogger(__name__)
 
 
 class AIExtractionClient:
@@ -39,6 +42,15 @@ class AIExtractionClient:
             content=content,
             schema_instructions=schema_instructions,
         )
+        logger.info(
+            "Starting AI extraction request",
+            extra={
+                "model_name": self._model_name,
+                "source_url": str(content.source_url),
+                "has_title": bool(content.title),
+                "content_length": len(content.readable_text),
+            },
+        )
 
         try:
             response = self._client.models.generate_content(
@@ -51,16 +63,36 @@ class AIExtractionClient:
                 },
             )
         except genai_errors.ClientError as exc:
+            logger.warning(
+                "AI extraction failed with client error",
+                extra={
+                    "model_name": self._model_name,
+                    "source_url": str(content.source_url),
+                    "error_type": type(exc).__name__,
+                },
+            )
             raise AIExtractionError(
                 "The AI extraction service could not process this link right now. Please try again."
             ) from exc
         except Exception as exc:
+            logger.exception(
+                "AI extraction failed with unexpected error",
+                extra={
+                    "model_name": self._model_name,
+                    "source_url": str(content.source_url),
+                    "error_type": type(exc).__name__,
+                },
+            )
             raise AIExtractionError(
                 "The AI extraction service is unavailable right now. Please try again."
             ) from exc
 
         response_text = getattr(response, "text", None)
         if not response_text:
+            logger.warning(
+                "AI extraction returned empty response",
+                extra={"model_name": self._model_name, "source_url": str(content.source_url)},
+            )
             raise AIExtractionError(
                 "The AI extraction service returned an empty response. Please try again."
             )
@@ -68,14 +100,35 @@ class AIExtractionClient:
         try:
             payload = json.loads(response_text)
         except json.JSONDecodeError as exc:
+            logger.warning(
+                "AI extraction returned invalid JSON",
+                extra={"model_name": self._model_name, "source_url": str(content.source_url)},
+            )
             raise AIExtractionError(
                 "The AI extraction service returned an invalid response. Please try again."
             ) from exc
 
         if not isinstance(payload, dict):
+            logger.warning(
+                "AI extraction returned unexpected JSON shape",
+                extra={
+                    "model_name": self._model_name,
+                    "source_url": str(content.source_url),
+                    "payload_type": type(payload).__name__,
+                },
+            )
             raise AIExtractionError(
                 "The AI extraction service returned an unexpected response shape. Please try again."
             )
+
+        logger.info(
+            "Finished AI extraction request",
+            extra={
+                "model_name": self._model_name,
+                "source_url": str(content.source_url),
+                "response_keys": sorted(payload.keys()),
+            },
+        )
 
         return payload
 

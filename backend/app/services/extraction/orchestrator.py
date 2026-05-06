@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from app.services.extraction.ai_client import AIExtractionClient
 from app.services.extraction.fetcher import LinkFetcher
 from app.services.extraction.readable_content import ReadableContentExtractor
@@ -13,6 +15,8 @@ from app.services.extraction.types import (
     ReadableContent,
     ReadableContentError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class ExtractionOrchestrator:
@@ -33,9 +37,25 @@ class ExtractionOrchestrator:
 
     def extract_from_link(self, request: ExtractionRequest) -> ExtractionResult:
         adapter = self._registry.get(request.entity_type)
+        logger.info(
+            "Starting extraction orchestration",
+            extra={
+                "entity_type": request.entity_type,
+                "url": str(request.url),
+                "used_raw_text": bool(request.raw_text),
+            },
+        )
         try:
             content = self._build_readable_content(request)
         except ReadableContentError as exc:
+            logger.warning(
+                "Extraction stopped because readable content was too thin or invalid",
+                extra={
+                    "entity_type": request.entity_type,
+                    "url": str(request.url),
+                    "reason": exc.message,
+                },
+            )
             return ExtractionResult(
                 entity_type=request.entity_type,
                 data={},
@@ -53,20 +73,38 @@ class ExtractionOrchestrator:
         if request.raw_text:
             warnings.append("Used pasted text because link extraction was unavailable or incomplete.")
 
-        return ExtractionResult(
+        final_result = ExtractionResult(
             entity_type=result.entity_type,
             data=result.data,
             warnings=self._dedupe_warnings(warnings),
         )
+        logger.info(
+            "Finished extraction orchestration",
+            extra={
+                "entity_type": final_result.entity_type,
+                "url": str(request.url),
+                "warning_count": len(final_result.warnings),
+                "filled_fields": sorted([key for key, value in final_result.data.items() if value]),
+            },
+        )
+        return final_result
 
     def _build_readable_content(self, request: ExtractionRequest) -> ReadableContent:
         if request.raw_text:
+            logger.info(
+                "Using pasted raw text for extraction instead of remote fetch",
+                extra={"entity_type": request.entity_type, "url": str(request.url)},
+            )
             return ReadableContent(
                 source_url=request.url,
                 readable_text=request.raw_text,
             )
 
         html = self._fetcher.fetch(str(request.url))
+        logger.info(
+            "Fetched remote content for extraction",
+            extra={"entity_type": request.entity_type, "url": str(request.url), "html_length": len(html)},
+        )
         return self._readable_content_extractor.extract(request.url, html)
 
     def _build_missing_field_warnings(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ipaddress
+import logging
 from urllib.parse import urlparse
 
 import httpx
@@ -15,6 +16,7 @@ SUPPORTED_CONTENT_TYPES = (
     "text/plain",
     "application/xhtml+xml",
 )
+logger = logging.getLogger(__name__)
 
 
 class LinkFetcher:
@@ -40,6 +42,9 @@ class LinkFetcher:
     def fetch(self, url: str) -> str:
         safe_url = self._validate_url(url)
         timeout = httpx.Timeout(self._timeout_seconds)
+        hostname = urlparse(safe_url).hostname or "unknown-host"
+
+        logger.info("Starting remote fetch for extraction", extra={"url": safe_url, "hostname": hostname})
 
         try:
             with httpx.Client(
@@ -50,16 +55,42 @@ class LinkFetcher:
                 with client.stream("GET", safe_url) as response:
                     response.raise_for_status()
                     self._validate_response_headers(response)
-                    return self._read_response_body(response)
+                    body = self._read_response_body(response)
+                    logger.info(
+                        "Finished remote fetch for extraction",
+                        extra={
+                            "url": safe_url,
+                            "hostname": hostname,
+                            "content_type": response.headers.get("Content-Type", ""),
+                            "body_length": len(body),
+                        },
+                    )
+                    return body
         except httpx.TimeoutException as exc:
+            logger.warning(
+                "Extraction fetch timed out",
+                extra={"url": safe_url, "hostname": hostname, "timeout_seconds": self._timeout_seconds},
+            )
             raise FetchError(
                 "The link took too long to respond. Please try another link or paste the job description."
             ) from exc
         except httpx.HTTPStatusError as exc:
+            logger.warning(
+                "Extraction fetch returned HTTP error",
+                extra={
+                    "url": safe_url,
+                    "hostname": hostname,
+                    "status_code": exc.response.status_code,
+                },
+            )
             raise FetchError(
                 "The link could not be accessed. Please check the URL or paste the job description."
             ) from exc
         except httpx.HTTPError as exc:
+            logger.warning(
+                "Extraction fetch failed with transport error",
+                extra={"url": safe_url, "hostname": hostname, "error_type": type(exc).__name__},
+            )
             raise FetchError(
                 "We could not read that link right now. Please try again or paste the job description."
             ) from exc
@@ -69,15 +100,21 @@ class LinkFetcher:
         hostname = parsed_url.hostname
 
         if parsed_url.scheme not in {"http", "https"} or not hostname:
+            logger.warning("Rejected extraction URL because scheme or host is invalid", extra={"url": url})
             raise FetchError("Only valid http and https links are supported.")
 
         if parsed_url.username or parsed_url.password:
+            logger.warning("Rejected extraction URL with embedded credentials", extra={"url": url})
             raise FetchError("Links with embedded credentials are not supported.")
 
         normalized_hostname = hostname.lower()
         if normalized_hostname in BLOCKED_HOSTNAMES or normalized_hostname.endswith(
             BLOCKED_HOST_SUFFIXES
         ):
+            logger.warning(
+                "Rejected extraction URL because hostname is blocked",
+                extra={"url": url, "hostname": normalized_hostname},
+            )
             raise FetchError("That link target is not allowed.")
 
         self._validate_hostname_address(normalized_hostname)
@@ -97,6 +134,10 @@ class LinkFetcher:
             or ip_address.is_reserved
             or ip_address.is_unspecified
         ):
+            logger.warning(
+                "Rejected extraction URL because IP target is unsafe",
+                extra={"hostname": hostname, "ip_address": str(ip_address)},
+            )
             raise FetchError("That link target is not allowed.")
 
     def _validate_response_headers(self, response: httpx.Response) -> None:
@@ -108,6 +149,10 @@ class LinkFetcher:
                 parsed_length = None
             else:
                 if parsed_length > self._max_response_bytes:
+                    logger.warning(
+                        "Rejected extraction response because declared size is too large",
+                        extra={"content_length": parsed_length, "max_response_bytes": self._max_response_bytes},
+                    )
                     raise FetchError(
                         "The page is too large to process safely. Please paste the job description instead."
                     )
@@ -116,6 +161,10 @@ class LinkFetcher:
         if content_type and not any(
             supported_type in content_type for supported_type in SUPPORTED_CONTENT_TYPES
         ):
+            logger.warning(
+                "Rejected extraction response because content type is unsupported",
+                extra={"content_type": content_type},
+            )
             raise FetchError("That link does not contain a supported text page.")
 
     def _read_response_body(self, response: httpx.Response) -> str:
@@ -126,6 +175,10 @@ class LinkFetcher:
             chunk_bytes = len(chunk.encode(response.encoding or "utf-8", errors="ignore"))
             total_bytes += chunk_bytes
             if total_bytes > self._max_response_bytes:
+                logger.warning(
+                    "Rejected extraction response because streamed body exceeded limit",
+                    extra={"body_bytes": total_bytes, "max_response_bytes": self._max_response_bytes},
+                )
                 raise FetchError(
                     "The page is too large to process safely. Please paste the job description instead."
                 )
@@ -133,6 +186,7 @@ class LinkFetcher:
 
         body = "".join(chunks).strip()
         if not body:
+            logger.warning("Rejected extraction response because body was empty after fetch")
             raise FetchError("The link did not return readable page content.")
 
         return body
