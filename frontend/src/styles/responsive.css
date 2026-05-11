@@ -27,10 +27,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .dashboard-job-card__meta {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .details-grid {
     grid-template-columns: 1fr;
   }
@@ -142,7 +138,6 @@
 
   .dashboard-stats,
   .dashboard-filters__grid,
-  .dashboard-job-card__meta,
   .job-form__grid,
   .details-grid,
   .dashboard-grid {
@@ -150,6 +145,8 @@
   }
 
   .dashboard-job-card__header,
+  .dashboard-job-card__footer,
+  .dashboard-job-card__footer-meta,
   .feedback-panel__action,
   .dashboard-filters__actions,
   .job-form__actions,
@@ -170,6 +167,7 @@
   }
 
   .dashboard-badge,
+  .dashboard-priority-tag,
   .dashboard-job-card__status,
   .status-badge {
     max-width: 100%;

@@ -5,6 +5,7 @@ import type { JobApplicationResponse } from "../../types/jobApplication";
 import type { DashboardViewMode } from "../../hooks/useDashboardFilters";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
 import { StatusBadge } from "../ui/StatusBadge";
+import { JobApplicationPriorityTag } from "./JobApplicationPriorityTag";
 
 interface JobApplicationCardProps {
   jobApplication: JobApplicationResponse;
@@ -12,24 +13,6 @@ interface JobApplicationCardProps {
   onArchive?: (jobApplication: JobApplicationResponse) => void;
   onRestore?: (jobApplication: JobApplicationResponse) => void;
   viewMode?: DashboardViewMode;
-}
-
-function formatDisplayDate(value: string | null) {
-  if (!value) {
-    return "No date yet";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }
 
 function getFollowUpState(jobApplication: JobApplicationResponse) {
@@ -100,7 +83,7 @@ export function JobApplicationCard({
       tabIndex={0}
     >
       <div className="dashboard-job-card__header">
-        <div>
+        <div className="dashboard-job-card__title-block">
           <p className="dashboard-job-card__company">{jobApplication.company_name}</p>
           <h3>{jobApplication.job_title}</h3>
         </div>
@@ -115,21 +98,6 @@ export function JobApplicationCard({
         {jobApplication.short_description?.trim() ||
           "No short description yet. Add details to keep this opportunity easy to scan."}
       </p>
-
-      <dl className="dashboard-job-card__meta">
-        <div>
-          <dt>Applied</dt>
-          <dd>{formatDisplayDate(jobApplication.application_date)}</dd>
-        </div>
-        <div>
-          <dt>Location</dt>
-          <dd>{jobApplication.location || "Not set"}</dd>
-        </div>
-        <div>
-          <dt>Source</dt>
-          <dd>{jobApplication.source || "Not set"}</dd>
-        </div>
-      </dl>
 
       <div className="dashboard-job-card__badges">
         {jobApplication.interview_stage ? (
@@ -150,43 +118,46 @@ export function JobApplicationCard({
             {isActionLoading ? `${actionLabel}...` : actionLabel}
           </button>
         </div>
-        <span
-          aria-label={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
-          className="dashboard-badge dashboard-badge--contacts"
-          title={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
-        >
-          <svg
-            aria-hidden="true"
-            className="dashboard-badge__icon"
-            fill="none"
-            viewBox="0 0 24 24"
+        <div className="dashboard-job-card__footer-meta">
+          <JobApplicationPriorityTag priority={jobApplication.priority} />
+          <span
+            aria-label={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
+            className="dashboard-badge dashboard-badge--contacts"
+            title={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
           >
-            <path
-              d="M16 19a4 4 0 0 0-8 0"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeWidth="2"
-            />
-            <path
-              d="M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <path
-              d="M20 18a3 3 0 0 0-3-3"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeWidth="2"
-            />
-            <path
-              d="M17 11a2.5 2.5 0 0 0 0-5"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeWidth="2"
-            />
-          </svg>
-          <span className="dashboard-badge__count">{contactsCount}</span>
-        </span>
+            <svg
+              aria-hidden="true"
+              className="dashboard-badge__icon"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16 19a4 4 0 0 0-8 0"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="2"
+              />
+              <path
+                d="M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+              <path
+                d="M20 18a3 3 0 0 0-3-3"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="2"
+              />
+              <path
+                d="M17 11a2.5 2.5 0 0 0 0-5"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="2"
+              />
+            </svg>
+            <span className="dashboard-badge__count">{contactsCount}</span>
+          </span>
+        </div>
       </div>
     </article>
   );
