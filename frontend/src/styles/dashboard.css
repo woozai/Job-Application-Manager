@@ -276,6 +276,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  margin-top: auto;
 }
 
 .dashboard-job-card__footer-actions {
