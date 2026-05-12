@@ -195,7 +195,7 @@
 
 .dashboard-job-card__company-row {
   min-width: 0;
-  padding-right: 9.5rem;
+  padding-right: 12.75rem;
 }
 
 .dashboard-job-card__title-block {
@@ -212,7 +212,6 @@
   position: absolute;
   top: 0;
   right: 0;
-  max-width: 8.5rem;
   flex: 0 0 auto;
 }
 

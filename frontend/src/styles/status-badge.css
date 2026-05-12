@@ -12,6 +12,15 @@
   white-space: nowrap;
 }
 
+.status-badge.dashboard-job-card__status {
+  box-sizing: border-box;
+  width: 11.75rem;
+  max-width: 11.75rem;
+  white-space: nowrap;
+  text-align: center;
+  overflow: hidden;
+}
+
 .status-badge--positive {
   border-color: rgba(22, 101, 52, 0.16);
   background: #dcfce7;
