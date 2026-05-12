@@ -101,15 +101,18 @@ export function JobApplicationCard({
       tabIndex={0}
     >
       <div className="dashboard-job-card__header">
-        <div className="dashboard-job-card__title-block">
+        <div className="dashboard-job-card__company-row">
           <p className="dashboard-job-card__company">{jobApplication.company_name}</p>
-          <h3>{jobApplication.job_title}</h3>
         </div>
         <StatusBadge
           className="dashboard-job-card__status"
           label={jobApplication.status}
           tone={getJobApplicationStatusTone(jobApplication.status)}
         />
+      </div>
+
+      <div className="dashboard-job-card__title-block">
+        <h3>{jobApplication.job_title}</h3>
       </div>
 
       <p className="dashboard-job-card__description">

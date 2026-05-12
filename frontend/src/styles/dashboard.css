@@ -114,7 +114,8 @@
 }
 
 .dashboard-job-card h3 {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .dashboard-grid {
@@ -184,15 +185,21 @@
 }
 
 .dashboard-job-card__header {
+  position: relative;
   display: flex;
   align-items: start;
   justify-content: space-between;
   gap: 1rem;
+  min-width: 0;
+}
+
+.dashboard-job-card__company-row {
+  min-width: 0;
+  padding-right: 9.5rem;
 }
 
 .dashboard-job-card__title-block {
-  display: grid;
-  gap: 0.45rem;
+  min-width: 0;
 }
 
 .dashboard-job-card__company {
@@ -202,6 +209,10 @@
 }
 
 .dashboard-job-card__status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  max-width: 8.5rem;
   flex: 0 0 auto;
 }
 
