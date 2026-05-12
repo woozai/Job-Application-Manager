@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import type { JobApplicationResponse } from "../../types/jobApplication";
 import type { DashboardViewMode } from "../../hooks/useDashboardFilters";
+import { formatDisplayDate } from "../../utils/display";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
 import { StatusBadge } from "../ui/StatusBadge";
 import { JobApplicationPriorityTag } from "./JobApplicationPriorityTag";
@@ -32,6 +33,22 @@ function getFollowUpState(jobApplication: JobApplicationResponse) {
   return nextActionDate <= today ? "Follow-up due" : "Upcoming action";
 }
 
+function renderArchiveReason(reason: string | null) {
+  if (reason?.trim()) {
+    return reason;
+  }
+
+  return (
+    <span
+      aria-label="Archive reason not set"
+      className="contacts-check contacts-check--empty"
+      title="Archive reason not set"
+    >
+      −
+    </span>
+  );
+}
+
 export function JobApplicationCard({
   jobApplication,
   isActionLoading = false,
@@ -43,6 +60,7 @@ export function JobApplicationCard({
   const followUpState = getFollowUpState(jobApplication);
   const contactsCount = jobApplication.contacts.length;
   const isArchiveView = viewMode === "archived";
+  const shouldShowArchiveMeta = isArchiveView && jobApplication.is_archived;
   const actionLabel = isArchiveView ? "Restore" : "Archive";
 
   function openDetails() {
@@ -76,22 +94,25 @@ export function JobApplicationCard({
   return (
     <article
       aria-label={`Open details for ${jobApplication.company_name} ${jobApplication.job_title}`}
-      className="dashboard-job-card"
+      className={`dashboard-job-card${shouldShowArchiveMeta ? " dashboard-job-card--archived" : ""}`}
       onClick={openDetails}
       onKeyDown={handleCardKeyDown}
       role="link"
       tabIndex={0}
     >
       <div className="dashboard-job-card__header">
-        <div className="dashboard-job-card__title-block">
+        <div className="dashboard-job-card__company-row">
           <p className="dashboard-job-card__company">{jobApplication.company_name}</p>
-          <h3>{jobApplication.job_title}</h3>
         </div>
         <StatusBadge
           className="dashboard-job-card__status"
           label={jobApplication.status}
           tone={getJobApplicationStatusTone(jobApplication.status)}
         />
+      </div>
+
+      <div className="dashboard-job-card__title-block">
+        <h3>{jobApplication.job_title}</h3>
       </div>
 
       <p className="dashboard-job-card__description">
@@ -105,6 +126,19 @@ export function JobApplicationCard({
         ) : null}
         {followUpState ? <span className="dashboard-badge">{followUpState}</span> : null}
       </div>
+
+      {shouldShowArchiveMeta ? (
+        <dl className="dashboard-job-card__archive-meta">
+          <div className="dashboard-job-card__archive-meta-item">
+            <dt>Archived at</dt>
+            <dd>{formatDisplayDate(jobApplication.archived_at)}</dd>
+          </div>
+          <div className="dashboard-job-card__archive-meta-item">
+            <dt>Archive reason</dt>
+            <dd>{renderArchiveReason(jobApplication.archive_reason)}</dd>
+          </div>
+        </dl>
+      ) : null}
 
       <div className="dashboard-job-card__footer">
         <div className="dashboard-job-card__footer-actions">
