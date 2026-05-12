@@ -41,7 +41,6 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
             />
           ),
         },
-        { label: "Archived at", value: formatDisplayDate(jobApplication.archived_at) },
         { label: "Application date", value: formatDisplayDate(jobApplication.application_date) },
         {
           label: "Job link",
@@ -49,7 +48,6 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
         },
         { label: "Source", value: formatDisplayValue(jobApplication.source) },
         { label: "Location", value: formatDisplayValue(jobApplication.location) },
-        { label: "Archive reason", value: formatDisplayValue(jobApplication.archive_reason) },
       ],
     },
     {
