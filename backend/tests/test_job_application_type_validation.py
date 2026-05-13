@@ -84,10 +84,36 @@ def test_job_application_accepts_null_application_type_on_create(client: TestCli
 
 
 @pytest.mark.parametrize(
+    ("legacy_value", "canonical_value"),
+    [
+        ("direct", "direct_from_site"),
+        ("through connection", "through_connection"),
+    ],
+)
+def test_job_application_normalizes_legacy_application_types_on_create(
+    client: TestClient,
+    legacy_value: str,
+    canonical_value: str,
+) -> None:
+    token = register_and_login(client)
+
+    response = client.post(
+        "/job-applications/",
+        headers=auth_headers(token),
+        json={
+            "company_name": "Legacy Types Inc",
+            "job_title": "Platform Engineer",
+            "application_type": legacy_value,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["application_type"] == canonical_value
+
+
+@pytest.mark.parametrize(
     "application_type",
     [
-        "direct",
-        "through connection",
         "linkedin",
         "referral",
     ],
@@ -137,7 +163,7 @@ def test_job_application_accepts_canonical_application_types_on_update(
     assert response.json()["application_type"] == application_type
 
 
-def test_job_application_rejects_unsupported_application_type_on_update(
+def test_job_application_rejects_unknown_application_type_on_update(
     client: TestClient,
 ) -> None:
     token = register_and_login(client)
@@ -146,8 +172,33 @@ def test_job_application_rejects_unsupported_application_type_on_update(
     response = client.put(
         f"/job-applications/{job_application['id']}",
         headers=auth_headers(token),
-        json={"application_type": "direct"},
+        json={"application_type": "linkedin"},
     )
 
     assert response.status_code == 422
     assert "Application Type must be one of" in response.text
+
+
+@pytest.mark.parametrize(
+    ("legacy_value", "canonical_value"),
+    [
+        ("direct", "direct_from_site"),
+        ("through connection", "through_connection"),
+    ],
+)
+def test_job_application_normalizes_legacy_application_types_on_update(
+    client: TestClient,
+    legacy_value: str,
+    canonical_value: str,
+) -> None:
+    token = register_and_login(client)
+    job_application = create_job_application(client, token)
+
+    response = client.put(
+        f"/job-applications/{job_application['id']}",
+        headers=auth_headers(token),
+        json={"application_type": legacy_value},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["application_type"] == canonical_value

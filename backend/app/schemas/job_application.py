@@ -8,7 +8,6 @@ from pydantic import Field, field_validator
 from app.schemas.base import BaseSchema
 from app.schemas.contact import ContactResponse
 from app.schemas.validators import (
-    validate_optional_choice,
     validate_optional_http_url,
     validate_optional_text,
     validate_required_text,
@@ -34,6 +33,10 @@ JOB_APPLICATION_APPLICATION_TYPE_VALUES = (
     "direct_from_site",
     "through_connection",
 )
+JOB_APPLICATION_APPLICATION_TYPE_LEGACY_MAP = {
+    "direct": "direct_from_site",
+    "through connection": "through_connection",
+}
 
 JOB_APPLICATION_APPLICATION_TYPE_MAX_LENGTH = 50
 JOB_APPLICATION_APPLICATION_TYPE_DESCRIPTION = (
@@ -66,6 +69,22 @@ def _format_field_name(field_name: str) -> str:
     return field_name.replace("_", " ").title()
 
 
+def normalize_job_application_application_type(value: object) -> str | None:
+    normalized_value = validate_optional_text(value, field_name="Application Type")
+    if normalized_value is None:
+        return None
+
+    canonical_value = JOB_APPLICATION_APPLICATION_TYPE_LEGACY_MAP.get(
+        normalized_value,
+        normalized_value,
+    )
+    if canonical_value not in JOB_APPLICATION_APPLICATION_TYPE_VALUES:
+        allowed_values_text = ", ".join(JOB_APPLICATION_APPLICATION_TYPE_VALUES)
+        raise ValueError(f"Application Type must be one of: {allowed_values_text}")
+
+    return canonical_value
+
+
 class JobApplicationValidationMixin(BaseSchema):
     application_type: Optional[str] = Field(
         None,
@@ -81,11 +100,7 @@ class JobApplicationValidationMixin(BaseSchema):
     @field_validator("application_type", mode="before")
     @classmethod
     def validate_application_type_field(cls, value: object) -> str | None:
-        return validate_optional_choice(
-            value,
-            field_name="Application Type",
-            allowed_values=JOB_APPLICATION_APPLICATION_TYPE_VALUES,
-        )
+        return normalize_job_application_application_type(value)
 
 
 class JobApplicationBase(JobApplicationValidationMixin):
