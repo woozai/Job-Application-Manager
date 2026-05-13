@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 from pydantic import Field, field_validator
 
 from app.schemas.base import BaseSchema
 from app.schemas.contact import ContactResponse
 from app.schemas.validators import (
+    validate_optional_choice,
     validate_optional_http_url,
     validate_optional_text,
     validate_required_text,
@@ -28,8 +29,66 @@ JobApplicationStatus = Literal[
     "archived",
 ]
 
+JOB_APPLICATION_APPLICATION_TYPE_VALUES = (
+    "recruiter",
+    "direct_from_site",
+    "through_connection",
+)
 
-class JobApplicationBase(BaseSchema):
+JOB_APPLICATION_APPLICATION_TYPE_MAX_LENGTH = 50
+JOB_APPLICATION_APPLICATION_TYPE_DESCRIPTION = (
+    "Type of application (recruiter, direct_from_site, through_connection)"
+)
+JOB_APPLICATION_OPTIONAL_TEXT_FIELDS = (
+    "source",
+    "short_description",
+    "full_description",
+    "required_skills",
+    "notes",
+    "location",
+    "work_mode",
+    "priority",
+    "salary_range",
+    "resume_version",
+    "recruiter_name",
+    "interview_stage",
+    "rejection_reason",
+)
+JOB_APPLICATION_UPDATE_OPTIONAL_TEXT_FIELDS = (
+    "company_name",
+    "job_title",
+    *JOB_APPLICATION_OPTIONAL_TEXT_FIELDS,
+    "archive_reason",
+)
+
+
+def _format_field_name(field_name: str) -> str:
+    return field_name.replace("_", " ").title()
+
+
+class JobApplicationValidationMixin(BaseSchema):
+    application_type: Optional[str] = Field(
+        None,
+        max_length=JOB_APPLICATION_APPLICATION_TYPE_MAX_LENGTH,
+        description=JOB_APPLICATION_APPLICATION_TYPE_DESCRIPTION,
+    )
+
+    @field_validator("job_link", mode="before", check_fields=False)
+    @classmethod
+    def validate_external_links(cls, value: object) -> str | None:
+        return validate_optional_http_url(value)
+
+    @field_validator("application_type", mode="before")
+    @classmethod
+    def validate_application_type_field(cls, value: object) -> str | None:
+        return validate_optional_choice(
+            value,
+            field_name="Application Type",
+            allowed_values=JOB_APPLICATION_APPLICATION_TYPE_VALUES,
+        )
+
+
+class JobApplicationBase(JobApplicationValidationMixin):
     company_name: str = Field(..., max_length=255, description="Name of the company")
     job_title: str = Field(..., max_length=255, description="Title of the job position")
     job_link: Optional[str] = Field(None, description="Link to the job posting")
@@ -56,9 +115,6 @@ class JobApplicationBase(BaseSchema):
     work_mode: Optional[str] = Field(
         None, max_length=50, description="Work mode (remote, onsite, hybrid)"
     )
-    application_type: Optional[str] = Field(
-        None, max_length=50, description="Type of application (direct, referral, etc.)"
-    )
     priority: Optional[str] = Field(
         None, max_length=50, description="Priority level of the application"
     )
@@ -84,43 +140,22 @@ class JobApplicationBase(BaseSchema):
         None, description="Reason for rejection if applicable"
     )
 
-    @field_validator("job_link", mode="before")
-    @classmethod
-    def validate_external_links(cls, value: object) -> str | None:
-        return validate_optional_http_url(value)
-
     @field_validator("company_name", "job_title", mode="before")
     @classmethod
     def validate_required_text_fields(cls, value: object, info) -> str:
-        return validate_required_text(value, field_name=info.field_name.replace("_", " ").title())
+        return validate_required_text(value, field_name=_format_field_name(info.field_name))
 
-    @field_validator(
-        "source",
-        "short_description",
-        "full_description",
-        "required_skills",
-        "notes",
-        "location",
-        "work_mode",
-        "application_type",
-        "priority",
-        "salary_range",
-        "resume_version",
-        "recruiter_name",
-        "interview_stage",
-        "rejection_reason",
-        mode="before",
-    )
+    @field_validator(*JOB_APPLICATION_OPTIONAL_TEXT_FIELDS, mode="before")
     @classmethod
     def normalize_optional_text_fields(cls, value: object, info) -> str | None:
-        return validate_optional_text(value, field_name=info.field_name.replace("_", " ").title())
+        return validate_optional_text(value, field_name=_format_field_name(info.field_name))
 
 
 class JobApplicationCreate(JobApplicationBase):
     pass
 
 
-class JobApplicationUpdate(BaseSchema):
+class JobApplicationUpdate(JobApplicationValidationMixin):
     company_name: Optional[str] = Field(
         None, max_length=255, description="Name of the company"
     )
@@ -150,9 +185,6 @@ class JobApplicationUpdate(BaseSchema):
     location: Optional[str] = Field(None, max_length=255, description="Job location")
     work_mode: Optional[str] = Field(
         None, max_length=50, description="Work mode (remote, onsite, hybrid)"
-    )
-    application_type: Optional[str] = Field(
-        None, max_length=50, description="Type of application (direct, referral, etc.)"
     )
     priority: Optional[str] = Field(
         None, max_length=50, description="Priority level of the application"
@@ -188,34 +220,10 @@ class JobApplicationUpdate(BaseSchema):
         None, description="Optional reason for archiving the job"
     )
 
-    @field_validator("job_link", mode="before")
-    @classmethod
-    def validate_external_links(cls, value: object) -> str | None:
-        return validate_optional_http_url(value)
-
-    @field_validator(
-        "company_name",
-        "job_title",
-        "source",
-        "short_description",
-        "full_description",
-        "required_skills",
-        "notes",
-        "location",
-        "work_mode",
-        "application_type",
-        "priority",
-        "salary_range",
-        "resume_version",
-        "recruiter_name",
-        "interview_stage",
-        "rejection_reason",
-        "archive_reason",
-        mode="before",
-    )
+    @field_validator(*JOB_APPLICATION_UPDATE_OPTIONAL_TEXT_FIELDS, mode="before")
     @classmethod
     def normalize_optional_text_fields(cls, value: object, info) -> str | None:
-        return validate_optional_text(value, field_name=info.field_name.replace("_", " ").title())
+        return validate_optional_text(value, field_name=_format_field_name(info.field_name))
 
 
 class JobApplicationResponse(JobApplicationBase):
@@ -230,7 +238,7 @@ class JobApplicationResponse(JobApplicationBase):
     archive_reason: Optional[str] = Field(
         None, description="Optional reason for archiving the job"
     )
-    contacts: List[ContactResponse] = Field(
+    contacts: list[ContactResponse] = Field(
         default_factory=list,
         description="List of contacts associated with the application",
     )

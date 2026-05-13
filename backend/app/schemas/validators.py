@@ -57,3 +57,20 @@ def validate_optional_http_url(value: object) -> str | None:
         raise ValueError("URL must be a valid http or https URL")
 
     return normalized_value
+
+
+def validate_optional_choice(
+    value: object,
+    *,
+    field_name: str,
+    allowed_values: tuple[str, ...],
+) -> str | None:
+    normalized_value = validate_optional_text(value, field_name=field_name)
+    if normalized_value is None:
+        return None
+
+    if normalized_value not in allowed_values:
+        allowed_values_text = ", ".join(allowed_values)
+        raise ValueError(f"{field_name} must be one of: {allowed_values_text}")
+
+    return normalized_value
