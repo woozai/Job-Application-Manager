@@ -5,6 +5,7 @@ import type { JobApplicationResponse } from "../../types/jobApplication";
 import type { DashboardViewMode } from "../../hooks/useDashboardFilters";
 import { formatDisplayDate } from "../../utils/display";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
+import { ApplicationTypeIcon } from "../ui/ApplicationTypeIcon";
 import { StatusBadge } from "../ui/StatusBadge";
 import { JobApplicationPriorityTag } from "./JobApplicationPriorityTag";
 
@@ -102,6 +103,12 @@ export function JobApplicationCard({
     >
       <div className="dashboard-job-card__header">
         <div className="dashboard-job-card__company-row">
+          <div className="dashboard-job-card__company-meta">
+            <ApplicationTypeIcon
+              applicationType={jobApplication.application_type}
+              className="application-type-icon dashboard-job-card__application-type-icon"
+            />
+          </div>
           <p className="dashboard-job-card__company">{jobApplication.company_name}</p>
         </div>
         <StatusBadge
