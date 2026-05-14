@@ -87,7 +87,7 @@ export function getJobApplicationApplicationTypeMetadata(
 export function getJobApplicationApplicationTypeLabel(
   value: string | null | undefined,
 ): string | null {
-  return getJobApplicationApplicationTypeMetadata(value)?.label ?? value?.trim() ?? null;
+  return getJobApplicationApplicationTypeMetadata(value)?.label ?? null;
 }
 
 export interface JobApplicationResponse {

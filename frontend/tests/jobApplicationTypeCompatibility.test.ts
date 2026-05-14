@@ -9,7 +9,10 @@ import {
   filterDashboardJobApplications,
   getDashboardApplicationTypeOptions,
 } from "../src/hooks/useDashboardFilters";
-import type { JobApplicationResponse } from "../src/types/jobApplication";
+import {
+  getJobApplicationApplicationTypeLabel,
+  type JobApplicationResponse,
+} from "../src/types/jobApplication";
 
 function createFormValues(
   overrides: Partial<JobApplicationFormValues> = {},
@@ -124,4 +127,10 @@ test("dashboard application type filtering matches canonical stored values", () 
     filtered.map((jobApplication) => jobApplication.company_name),
     ["Canonical"],
   );
+});
+
+test("unsupported application type labels are hidden in canonical-only frontend flows", () => {
+  assert.equal(getJobApplicationApplicationTypeLabel("direct"), null);
+  assert.equal(getJobApplicationApplicationTypeLabel("through connection"), null);
+  assert.equal(getJobApplicationApplicationTypeLabel("unknown-source"), null);
 });
