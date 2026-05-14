@@ -96,6 +96,17 @@
   overflow-wrap: anywhere;
 }
 
+.details-application-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.details-application-type__icon {
+  width: 1.85rem;
+  height: 1.85rem;
+}
+
 .details-link {
   display: inline-block;
   max-width: 100%;
