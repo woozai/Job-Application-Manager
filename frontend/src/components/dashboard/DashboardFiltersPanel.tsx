@@ -1,10 +1,15 @@
+import type {
+  JobApplicationApplicationTypeMetadata,
+} from "../../types/jobApplication";
+import type { DashboardApplicationTypeFilterValue } from "../../hooks/useDashboardFilters";
+
 interface DashboardFiltersPanelProps {
-  applicationTypeFilter: string;
+  applicationTypeFilter: DashboardApplicationTypeFilterValue;
   companyFilter: string;
   dateFromFilter: string;
   dateToFilter: string;
   filterOptions: {
-    applicationTypes: string[];
+    applicationTypes: JobApplicationApplicationTypeMetadata[];
     companies: string[];
     statuses: string[];
   };
@@ -12,7 +17,7 @@ interface DashboardFiltersPanelProps {
   onClose: () => void;
   onReset: () => void;
   searchTerm: string;
-  setApplicationTypeFilter: (value: string) => void;
+  setApplicationTypeFilter: (value: DashboardApplicationTypeFilterValue) => void;
   setCompanyFilter: (value: string) => void;
   setDateFromFilter: (value: string) => void;
   setDateToFilter: (value: string) => void;
@@ -73,9 +78,20 @@ export function DashboardFiltersPanel({
         </div>
         <div className="form-field">
           <label className="form-label" htmlFor="dashboard-application-type-filter">Application type</label>
-          <select id="dashboard-application-type-filter" className="form-input" onChange={(event) => setApplicationTypeFilter(event.target.value)} value={applicationTypeFilter}>
+          <select
+            id="dashboard-application-type-filter"
+            className="form-input"
+            onChange={(event) =>
+              setApplicationTypeFilter(event.target.value as DashboardApplicationTypeFilterValue)
+            }
+            value={applicationTypeFilter}
+          >
             <option value="all">All application types</option>
-            {filterOptions.applicationTypes.map((applicationType) => <option key={applicationType} value={applicationType}>{applicationType}</option>)}
+            {filterOptions.applicationTypes.map((applicationType) => (
+              <option key={applicationType.value} value={applicationType.value}>
+                {applicationType.label}
+              </option>
+            ))}
           </select>
         </div>
         <div className="form-field">
