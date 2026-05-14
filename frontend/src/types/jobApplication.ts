@@ -58,11 +58,6 @@ const jobApplicationApplicationTypeMetadataByValue: Record<
   through_connection: jobApplicationApplicationTypes[2],
 };
 
-const legacyJobApplicationApplicationTypeMap: Record<string, JobApplicationApplicationType> = {
-  direct: "direct_from_site",
-  "through connection": "through_connection",
-};
-
 export function normalizeJobApplicationApplicationType(
   value: string | null | undefined,
 ): JobApplicationApplicationType | null {
@@ -75,7 +70,7 @@ export function normalizeJobApplicationApplicationType(
     return normalizedValue as JobApplicationApplicationType;
   }
 
-  return legacyJobApplicationApplicationTypeMap[normalizedValue] ?? null;
+  return null;
 }
 
 export function getJobApplicationApplicationTypeMetadata(

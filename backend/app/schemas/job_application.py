@@ -33,10 +33,6 @@ JOB_APPLICATION_APPLICATION_TYPE_VALUES = (
     "direct_from_site",
     "through_connection",
 )
-JOB_APPLICATION_APPLICATION_TYPE_LEGACY_MAP = {
-    "direct": "direct_from_site",
-    "through connection": "through_connection",
-}
 
 JOB_APPLICATION_APPLICATION_TYPE_MAX_LENGTH = 50
 JOB_APPLICATION_APPLICATION_TYPE_DESCRIPTION = (
@@ -74,15 +70,11 @@ def normalize_job_application_application_type(value: object) -> str | None:
     if normalized_value is None:
         return None
 
-    canonical_value = JOB_APPLICATION_APPLICATION_TYPE_LEGACY_MAP.get(
-        normalized_value,
-        normalized_value,
-    )
-    if canonical_value not in JOB_APPLICATION_APPLICATION_TYPE_VALUES:
+    if normalized_value not in JOB_APPLICATION_APPLICATION_TYPE_VALUES:
         allowed_values_text = ", ".join(JOB_APPLICATION_APPLICATION_TYPE_VALUES)
         raise ValueError(f"Application Type must be one of: {allowed_values_text}")
 
-    return canonical_value
+    return normalized_value
 
 
 class JobApplicationValidationMixin(BaseSchema):
