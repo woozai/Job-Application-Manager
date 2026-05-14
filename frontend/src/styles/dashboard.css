@@ -194,18 +194,8 @@
 }
 
 .dashboard-job-card__company-row {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
   min-width: 0;
   padding-right: 12.75rem;
-}
-
-.dashboard-job-card__company-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 0 0 auto;
 }
 
 .dashboard-job-card__application-type-icon {

@@ -103,12 +103,6 @@ export function JobApplicationCard({
     >
       <div className="dashboard-job-card__header">
         <div className="dashboard-job-card__company-row">
-          <div className="dashboard-job-card__company-meta">
-            <ApplicationTypeIcon
-              applicationType={jobApplication.application_type}
-              className="application-type-icon dashboard-job-card__application-type-icon"
-            />
-          </div>
           <p className="dashboard-job-card__company">{jobApplication.company_name}</p>
         </div>
         <StatusBadge
@@ -160,6 +154,10 @@ export function JobApplicationCard({
           </button>
         </div>
         <div className="dashboard-job-card__footer-meta">
+          <ApplicationTypeIcon
+            applicationType={jobApplication.application_type}
+            className="application-type-icon dashboard-job-card__application-type-icon"
+          />
           <JobApplicationPriorityTag priority={jobApplication.priority} />
           <span
             aria-label={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}
