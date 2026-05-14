@@ -2,9 +2,13 @@ import type { ReactNode } from "react";
 
 import { ExpandableText } from "../ui/ExpandableText";
 import { MarkdownText } from "../ui/MarkdownText";
-import type { JobApplicationResponse } from "../../types/jobApplication";
+import {
+  getJobApplicationApplicationTypeLabel,
+  type JobApplicationResponse,
+} from "../../types/jobApplication";
 import { formatDisplayDate, formatDisplayValue } from "../../utils/display";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
+import { ApplicationTypeIcon } from "../ui/ApplicationTypeIcon";
 import { ExternalLink } from "../ui/ExternalLink";
 import { StatusBadge } from "../ui/StatusBadge";
 
@@ -17,6 +21,8 @@ interface DetailSection {
 }
 
 function createDetailSections(jobApplication: JobApplicationResponse): DetailSection[] {
+  const applicationTypeLabel = getJobApplicationApplicationTypeLabel(jobApplication.application_type);
+
   return [
     {
       title: "Basic information",
@@ -63,7 +69,20 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
       title: "Process tracking",
       items: [
         { label: "Work mode", value: formatDisplayValue(jobApplication.work_mode) },
-        { label: "Application type", value: formatDisplayValue(jobApplication.application_type) },
+        {
+          label: "Application type",
+          value: applicationTypeLabel ? (
+            <span className="details-application-type">
+              <ApplicationTypeIcon
+                applicationType={jobApplication.application_type}
+                className="application-type-icon details-application-type__icon"
+              />
+              <span>{applicationTypeLabel}</span>
+            </span>
+          ) : (
+            formatDisplayValue(applicationTypeLabel)
+          ),
+        },
         { label: "Priority", value: formatDisplayValue(jobApplication.priority) },
         { label: "Salary range", value: formatDisplayValue(jobApplication.salary_range) },
         { label: "Resume version", value: formatDisplayValue(jobApplication.resume_version) },

@@ -5,6 +5,7 @@ import type { JobApplicationResponse } from "../../types/jobApplication";
 import type { DashboardViewMode } from "../../hooks/useDashboardFilters";
 import { formatDisplayDate } from "../../utils/display";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
+import { ApplicationTypeIcon } from "../ui/ApplicationTypeIcon";
 import { StatusBadge } from "../ui/StatusBadge";
 import { JobApplicationPriorityTag } from "./JobApplicationPriorityTag";
 
@@ -153,6 +154,10 @@ export function JobApplicationCard({
           </button>
         </div>
         <div className="dashboard-job-card__footer-meta">
+          <ApplicationTypeIcon
+            applicationType={jobApplication.application_type}
+            className="application-type-icon dashboard-job-card__application-type-icon"
+          />
           <JobApplicationPriorityTag priority={jobApplication.priority} />
           <span
             aria-label={`${contactsCount} ${contactsCount === 1 ? "contact" : "contacts"}`}

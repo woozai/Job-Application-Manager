@@ -1,8 +1,75 @@
 import { useMemo, useState } from "react";
 
-import type { JobApplicationResponse } from "../types/jobApplication";
+import {
+  getJobApplicationApplicationTypeMetadata,
+  normalizeJobApplicationApplicationType,
+  type JobApplicationApplicationType,
+  type JobApplicationResponse,
+} from "../types/jobApplication";
 
 export type DashboardViewMode = "active" | "archived";
+export type DashboardApplicationTypeFilterValue = "all" | JobApplicationApplicationType;
+
+export function getDashboardApplicationTypeOptions(
+  scopedJobApplications: JobApplicationResponse[],
+) {
+  const applicationTypeValues = new Set<JobApplicationApplicationType>();
+
+  for (const jobApplication of scopedJobApplications) {
+    const applicationType = normalizeJobApplicationApplicationType(jobApplication.application_type);
+    if (applicationType) {
+      applicationTypeValues.add(applicationType);
+    }
+  }
+
+  return Array.from(applicationTypeValues)
+    .map((applicationType) => getJobApplicationApplicationTypeMetadata(applicationType))
+    .filter((applicationType): applicationType is NonNullable<typeof applicationType> => Boolean(applicationType))
+    .sort((left, right) => left.label.localeCompare(right.label));
+}
+
+interface DashboardJobApplicationFilterParams {
+  applicationTypeFilter: DashboardApplicationTypeFilterValue;
+  companyFilter: string;
+  dateFromFilter: string;
+  dateToFilter: string;
+  jobApplications: JobApplicationResponse[];
+  searchTerm: string;
+  statusFilter: string;
+}
+
+export function filterDashboardJobApplications({
+  applicationTypeFilter,
+  companyFilter,
+  dateFromFilter,
+  dateToFilter,
+  jobApplications,
+  searchTerm,
+  statusFilter,
+}: DashboardJobApplicationFilterParams) {
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+
+  return jobApplications.filter((jobApplication) => {
+    const applicationDate = jobApplication.application_date ?? "";
+
+    return (
+      (normalizedSearch.length === 0 ||
+        [jobApplication.company_name, jobApplication.job_title, jobApplication.short_description ?? "", jobApplication.notes ?? ""]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedSearch)) &&
+      (statusFilter === "all" || (jobApplication.status ?? "").trim() === statusFilter) &&
+      (companyFilter === "all" || jobApplication.company_name.trim() === companyFilter) &&
+      (
+        applicationTypeFilter === "all" ||
+        normalizeJobApplicationApplicationType(jobApplication.application_type) ===
+          applicationTypeFilter
+      ) &&
+      (!dateFromFilter || (applicationDate !== "" && applicationDate >= dateFromFilter)) &&
+      (!dateToFilter || (applicationDate !== "" && applicationDate <= dateToFilter))
+    );
+  });
+}
 
 export function useDashboardFilters(
   jobApplications: JobApplicationResponse[],
@@ -11,7 +78,8 @@ export function useDashboardFilters(
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [companyFilter, setCompanyFilter] = useState("all");
-  const [applicationTypeFilter, setApplicationTypeFilter] = useState("all");
+  const [applicationTypeFilter, setApplicationTypeFilter] =
+    useState<DashboardApplicationTypeFilterValue>("all");
   const [dateFromFilter, setDateFromFilter] = useState("");
   const [dateToFilter, setDateToFilter] = useState("");
   const scopedJobApplications = useMemo(
@@ -25,7 +93,6 @@ export function useDashboardFilters(
   const filterOptions = useMemo(() => {
     const companies = new Set<string>();
     const statuses = new Set<string>();
-    const applicationTypes = new Set<string>();
 
     for (const jobApplication of scopedJobApplications) {
       if (jobApplication.company_name.trim()) {
@@ -34,36 +101,24 @@ export function useDashboardFilters(
       if ((jobApplication.status ?? "").trim()) {
         statuses.add((jobApplication.status ?? "").trim());
       }
-      if ((jobApplication.application_type ?? "").trim()) {
-        applicationTypes.add((jobApplication.application_type ?? "").trim());
-      }
     }
 
     return {
+      applicationTypes: getDashboardApplicationTypeOptions(scopedJobApplications),
       companies: Array.from(companies).sort((left, right) => left.localeCompare(right)),
       statuses: Array.from(statuses).sort((left, right) => left.localeCompare(right)),
-      applicationTypes: Array.from(applicationTypes).sort((left, right) => left.localeCompare(right)),
     };
   }, [scopedJobApplications]);
 
   const filteredJobApplications = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-
-    return scopedJobApplications.filter((jobApplication) => {
-      const applicationDate = jobApplication.application_date ?? "";
-
-      return (
-        (normalizedSearch.length === 0 ||
-          [jobApplication.company_name, jobApplication.job_title, jobApplication.short_description ?? "", jobApplication.notes ?? ""]
-            .join(" ")
-            .toLowerCase()
-            .includes(normalizedSearch)) &&
-        (statusFilter === "all" || (jobApplication.status ?? "").trim() === statusFilter) &&
-        (companyFilter === "all" || jobApplication.company_name.trim() === companyFilter) &&
-        (applicationTypeFilter === "all" || (jobApplication.application_type ?? "").trim() === applicationTypeFilter) &&
-        (!dateFromFilter || (applicationDate !== "" && applicationDate >= dateFromFilter)) &&
-        (!dateToFilter || (applicationDate !== "" && applicationDate <= dateToFilter))
-      );
+    return filterDashboardJobApplications({
+      applicationTypeFilter,
+      companyFilter,
+      dateFromFilter,
+      dateToFilter,
+      jobApplications: scopedJobApplications,
+      searchTerm,
+      statusFilter,
     });
   }, [applicationTypeFilter, companyFilter, dateFromFilter, dateToFilter, scopedJobApplications, searchTerm, statusFilter]);
 
