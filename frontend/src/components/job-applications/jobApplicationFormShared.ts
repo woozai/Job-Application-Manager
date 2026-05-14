@@ -1,5 +1,10 @@
-import { jobApplicationWorkflowStatuses } from "../../types/jobApplication";
+import {
+  jobApplicationApplicationTypes,
+  jobApplicationWorkflowStatuses,
+  normalizeJobApplicationApplicationType,
+} from "../../types/jobApplication";
 import type {
+  JobApplicationApplicationType,
   JobApplicationCreateInput,
   JobExtractionData,
   JobApplicationResponse,
@@ -21,7 +26,7 @@ export interface JobApplicationFormValues {
   notes: string;
   location: string;
   work_mode: string;
-  application_type: string;
+  application_type: JobApplicationApplicationType | "";
   priority: string;
   salary_range: string;
   resume_version: string;
@@ -42,7 +47,7 @@ export interface JobApplicationFormErrors {
 export const statusOptions = jobApplicationWorkflowStatuses;
 
 export const workModeOptions = ["remote", "hybrid", "onsite"];
-export const applicationTypeOptions = ["direct", "through connection", "recruiter"];
+export const applicationTypeOptions = jobApplicationApplicationTypes;
 export const priorityOptions = ["low", "medium", "high"];
 
 export function createInitialValues(initialData?: JobApplicationResponse): JobApplicationFormValues {
@@ -62,7 +67,7 @@ export function createInitialValues(initialData?: JobApplicationResponse): JobAp
     notes: initialData?.notes ?? "",
     location: initialData?.location ?? "",
     work_mode: initialData?.work_mode ?? "",
-    application_type: initialData?.application_type ?? "",
+    application_type: normalizeJobApplicationApplicationType(initialData?.application_type) ?? "",
     priority: initialData?.priority ?? "",
     salary_range: initialData?.salary_range ?? "",
     resume_version: initialData?.resume_version ?? "",
@@ -107,7 +112,7 @@ export function buildPayload(values: JobApplicationFormValues): JobApplicationCr
     notes: normalizeOptionalValue(values.notes),
     location: normalizeOptionalValue(values.location),
     work_mode: normalizeOptionalValue(values.work_mode),
-    application_type: normalizeOptionalValue(values.application_type),
+    application_type: normalizeJobApplicationApplicationType(values.application_type),
     priority: normalizeOptionalValue(values.priority),
     salary_range: normalizeOptionalValue(values.salary_range),
     resume_version: normalizeOptionalValue(values.resume_version),

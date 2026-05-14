@@ -20,6 +20,81 @@ export const jobApplicationWorkflowStatuses = jobApplicationStatuses.filter(
   (status) => status !== "archived",
 );
 
+export const jobApplicationApplicationTypes = [
+  {
+    value: "recruiter",
+    label: "Recruiter",
+    iconKey: "recruiter",
+    iconLabel: "Recruiter application",
+  },
+  {
+    value: "direct_from_site",
+    label: "Direct from site",
+    iconKey: "direct_from_site",
+    iconLabel: "Direct from site application",
+  },
+  {
+    value: "through_connection",
+    label: "Through connection",
+    iconKey: "through_connection",
+    iconLabel: "Through connection application",
+  },
+] as const;
+
+export type JobApplicationApplicationType = (typeof jobApplicationApplicationTypes)[number]["value"];
+export type JobApplicationApplicationTypeIconKey = (typeof jobApplicationApplicationTypes)[number]["iconKey"];
+export type JobApplicationApplicationTypeMetadata = (typeof jobApplicationApplicationTypes)[number];
+
+const jobApplicationApplicationTypeValueSet = new Set<string>(
+  jobApplicationApplicationTypes.map((applicationType) => applicationType.value),
+);
+
+const jobApplicationApplicationTypeMetadataByValue: Record<
+  JobApplicationApplicationType,
+  JobApplicationApplicationTypeMetadata
+> = {
+  recruiter: jobApplicationApplicationTypes[0],
+  direct_from_site: jobApplicationApplicationTypes[1],
+  through_connection: jobApplicationApplicationTypes[2],
+};
+
+const legacyJobApplicationApplicationTypeMap: Record<string, JobApplicationApplicationType> = {
+  direct: "direct_from_site",
+  "through connection": "through_connection",
+};
+
+export function normalizeJobApplicationApplicationType(
+  value: string | null | undefined,
+): JobApplicationApplicationType | null {
+  const normalizedValue = value?.trim();
+  if (!normalizedValue) {
+    return null;
+  }
+
+  if (jobApplicationApplicationTypeValueSet.has(normalizedValue)) {
+    return normalizedValue as JobApplicationApplicationType;
+  }
+
+  return legacyJobApplicationApplicationTypeMap[normalizedValue] ?? null;
+}
+
+export function getJobApplicationApplicationTypeMetadata(
+  value: string | null | undefined,
+): JobApplicationApplicationTypeMetadata | null {
+  const normalizedValue = normalizeJobApplicationApplicationType(value);
+  if (!normalizedValue) {
+    return null;
+  }
+
+  return jobApplicationApplicationTypeMetadataByValue[normalizedValue];
+}
+
+export function getJobApplicationApplicationTypeLabel(
+  value: string | null | undefined,
+): string | null {
+  return getJobApplicationApplicationTypeMetadata(value)?.label ?? value?.trim() ?? null;
+}
+
 export interface JobApplicationResponse {
   id: number;
   user_id: number;
@@ -35,7 +110,7 @@ export interface JobApplicationResponse {
   notes: string | null;
   location: string | null;
   work_mode: string | null;
-  application_type: string | null;
+  application_type: JobApplicationApplicationType | null;
   priority: string | null;
   salary_range: string | null;
   resume_version: string | null;
@@ -65,7 +140,7 @@ export interface JobApplicationCreateInput {
   notes?: string | null;
   location?: string | null;
   work_mode?: string | null;
-  application_type?: string | null;
+  application_type?: JobApplicationApplicationType | null;
   priority?: string | null;
   salary_range?: string | null;
   resume_version?: string | null;
@@ -89,7 +164,7 @@ export interface JobApplicationUpdateInput {
   notes?: string | null;
   location?: string | null;
   work_mode?: string | null;
-  application_type?: string | null;
+  application_type?: JobApplicationApplicationType | null;
   priority?: string | null;
   salary_range?: string | null;
   resume_version?: string | null;

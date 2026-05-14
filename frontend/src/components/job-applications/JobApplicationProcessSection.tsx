@@ -24,9 +24,23 @@ export function JobApplicationProcessSection({ updateField, values }: JobApplica
         </div>
         <div className="form-field">
           <label className="form-label" htmlFor="application_type">Application type</label>
-          <select id="application_type" className="form-input" value={values.application_type} onChange={(event) => updateField("application_type", event.target.value)}>
+          <select
+            id="application_type"
+            className="form-input"
+            value={values.application_type}
+            onChange={(event) =>
+              updateField(
+                "application_type",
+                event.target.value as JobApplicationFormValues["application_type"],
+              )
+            }
+          >
             <option value="">Not set</option>
-            {applicationTypeOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+            {applicationTypeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
         <div className="form-field">

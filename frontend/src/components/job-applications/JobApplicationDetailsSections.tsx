@@ -2,7 +2,10 @@ import type { ReactNode } from "react";
 
 import { ExpandableText } from "../ui/ExpandableText";
 import { MarkdownText } from "../ui/MarkdownText";
-import type { JobApplicationResponse } from "../../types/jobApplication";
+import {
+  getJobApplicationApplicationTypeLabel,
+  type JobApplicationResponse,
+} from "../../types/jobApplication";
 import { formatDisplayDate, formatDisplayValue } from "../../utils/display";
 import { getJobApplicationStatusTone } from "../../utils/jobApplicationStatusTone";
 import { ExternalLink } from "../ui/ExternalLink";
@@ -63,7 +66,10 @@ function createDetailSections(jobApplication: JobApplicationResponse): DetailSec
       title: "Process tracking",
       items: [
         { label: "Work mode", value: formatDisplayValue(jobApplication.work_mode) },
-        { label: "Application type", value: formatDisplayValue(jobApplication.application_type) },
+        {
+          label: "Application type",
+          value: formatDisplayValue(getJobApplicationApplicationTypeLabel(jobApplication.application_type)),
+        },
         { label: "Priority", value: formatDisplayValue(jobApplication.priority) },
         { label: "Salary range", value: formatDisplayValue(jobApplication.salary_range) },
         { label: "Resume version", value: formatDisplayValue(jobApplication.resume_version) },
