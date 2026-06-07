@@ -151,9 +151,11 @@ def extract_from_link(
     orchestrator: ExtractionOrchestrator | None = None,
 ) -> ExtractionResult:
     service = orchestrator or build_default_extraction_orchestrator()
-    request = ExtractionRequest(
-        entity_type=entity_type,
-        url=url,
-        raw_text=raw_text,
+    request = ExtractionRequest.model_validate(
+        {
+            "entity_type": entity_type,
+            "url": url,
+            "raw_text": raw_text,
+        }
     )
     return service.extract_from_link(request)
